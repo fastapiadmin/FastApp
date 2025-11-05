@@ -1,0 +1,149 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "type": "home",
+      "name": "index",
+      "style": {
+        "navigationStyle": "custom"
+      },
+      "layout": "tabbar"
+    },
+    {
+      "path": "pages/login/index",
+      "type": "page",
+      "name": "login",
+      "style": {}
+    },
+    {
+      "path": "pages/mine/index",
+      "type": "page",
+      "name": "mine",
+      "style": {
+        "navigationStyle": "custom"
+      },
+      "layout": "tabbar"
+    },
+    {
+      "path": "pages/work/index",
+      "type": "page",
+      "name": "work",
+      "style": {
+        "navigationStyle": "custom"
+      },
+      "layout": "tabbar",
+      "meta": {
+        "requireAuth": true
+      }
+    },
+    {
+      "path": "pages/mine/about/index",
+      "type": "page",
+      "name": "about",
+      "style": {}
+    },
+    {
+      "path": "pages/mine/faq/index",
+      "type": "page",
+      "name": "faq",
+      "style": {}
+    },
+    {
+      "path": "pages/mine/feedback/index",
+      "type": "page",
+      "name": "feedback",
+      "style": {}
+    },
+    {
+      "path": "pages/mine/profile/complete-profile",
+      "type": "page"
+    },
+    {
+      "path": "pages/mine/profile/index",
+      "type": "page",
+      "name": "profile",
+      "style": {}
+    },
+    {
+      "path": "pages/mine/settings/index",
+      "type": "page",
+      "name": "settings",
+      "style": {
+        "navigationBarTitleText": "设置"
+      }
+    },
+    {
+      "path": "pages/mine/settings/account/index",
+      "type": "page",
+      "name": "account",
+      "style": {
+        "navigationBarTitleText": "账号和安全"
+      },
+      "layout": "tabbar"
+    },
+    {
+      "path": "pages/mine/settings/agreement/index",
+      "type": "page",
+      "name": "agreement",
+      "style": {
+        "navigationBarTitleText": "用户协议"
+      },
+      "layout": "tabbar"
+    },
+    {
+      "path": "pages/mine/settings/network/index",
+      "type": "page",
+      "name": "network",
+      "style": {}
+    },
+    {
+      "path": "pages/mine/settings/privacy/index",
+      "type": "page",
+      "name": "privacy",
+      "style": {}
+    },
+    {
+      "path": "pages/mine/settings/theme/index",
+      "type": "page",
+      "name": "theme",
+      "style": {
+        "navigationBarTitleText": "主题设置"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarBackgroundColor": "@navBgColor",
+    "navigationBarTextStyle": "@navTxtStyle",
+    "navigationBarTitleText": "FastApp",
+    "backgroundColor": "@bgColor",
+    "backgroundTextStyle": "@bgTxtStyle",
+    "backgroundColorTop": "@bgColorTop",
+    "backgroundColorBottom": "@bgColorBottom",
+    "enablePullDownRefresh": false,
+    "onReachBottomDistance": 50,
+    "animationType": "pop-in",
+    "animationDuration": 300
+  },
+  "tabBar": {
+    "custom": true,
+    "customize": true,
+    "overlay": true,
+    "height": "0",
+    "color": "@tabColor",
+    "selectedColor": "@tabSelectedColor",
+    "backgroundColor": "@tabBgColor",
+    "borderStyle": "@tabBorderStyle",
+    "list": [
+      {
+        "pagePath": "pages/index/index"
+      },
+      {
+        "pagePath": "pages/work/index"
+      },
+      {
+        "pagePath": "pages/mine/index"
+      }
+    ]
+  },
+  "subPackages": []
+}
