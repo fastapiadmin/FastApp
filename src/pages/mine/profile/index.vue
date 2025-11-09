@@ -162,6 +162,12 @@ import UserAPI, { type UserInfo } from "@/api/user";
 import FileAPI from "@/api/file";
 import { checkLogin } from "@/utils/auth";
 import type { FormRules } from "wot-design-uni/components/wd-form/types";
+import { useNavigationBar } from "@/composables/useNavigationBar";
+
+const { initNavigationBar } = useNavigationBar();
+
+// 初始化导航栏样式
+initNavigationBar();
 
 const originalSrc = ref<string>(""); //选取的原图路径
 const avatarShow = ref<boolean>(false); //显示头像裁剪

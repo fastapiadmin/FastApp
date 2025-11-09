@@ -10,6 +10,7 @@ declare global {
   const EffectScope: typeof import('vue')['EffectScope']
   const Storage: typeof import('../utils/storage')['Storage']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
+  const adjustColorBrightness: typeof import('../utils/color')['adjustColorBrightness']
   const auth: typeof import('../api/auth')['default']
   const checkLogin: typeof import('../utils/auth')['checkLogin']
   const clearAll: typeof import('../utils/auth')['clearAll']
@@ -39,6 +40,7 @@ declare global {
   const getUserInfo: typeof import('../utils/auth')['getUserInfo']
   const guessSerializerType: typeof import('@uni-helper/uni-use')['guessSerializerType']
   const h: typeof import('vue')['h']
+  const hexToRgb: typeof import('../utils/color')['hexToRgb']
   const inject: typeof import('vue')['inject']
   const isLoggedIn: typeof import('../utils/auth')['isLoggedIn']
   const isProxy: typeof import('vue')['isProxy']
@@ -103,6 +105,7 @@ declare global {
   const request: typeof import('../utils/request')['default']
   const requireLogin: typeof import('../utils/auth')['requireLogin']
   const resolveComponent: typeof import('vue')['resolveComponent']
+  const rgbToHex: typeof import('../utils/color')['rgbToHex']
   const role: typeof import('../api/role')['default']
   const setAccessToken: typeof import('../utils/auth')['setAccessToken']
   const setActivePinia: typeof import('pinia')['setActivePinia']
@@ -145,6 +148,7 @@ declare global {
   const useMessage: typeof import('wot-design-uni')['useMessage']
   const useModal: typeof import('@uni-helper/uni-use')['useModal']
   const useModel: typeof import('vue')['useModel']
+  const useNavigationBar: typeof import('../composables/useNavigationBar')['useNavigationBar']
   const useNetwork: typeof import('@uni-helper/uni-use')['useNetwork']
   const useNotify: typeof import('wot-design-uni')['useNotify']
   const useOnline: typeof import('@uni-helper/uni-use')['useOnline']
@@ -195,6 +199,7 @@ declare module 'vue' {
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
     readonly Storage: UnwrapRef<typeof import('../utils/storage')['Storage']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('pinia')['acceptHMRUpdate']>
+    readonly adjustColorBrightness: UnwrapRef<typeof import('../utils/color')['adjustColorBrightness']>
     readonly auth: UnwrapRef<typeof import('../api/auth')['default']>
     readonly checkLogin: UnwrapRef<typeof import('../utils/auth')['checkLogin']>
     readonly clearAll: UnwrapRef<typeof import('../utils/auth')['clearAll']>
@@ -218,6 +223,7 @@ declare module 'vue' {
     readonly getRefreshToken: UnwrapRef<typeof import('../utils/auth')['getRefreshToken']>
     readonly getUserInfo: UnwrapRef<typeof import('../utils/auth')['getUserInfo']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
+    readonly hexToRgb: UnwrapRef<typeof import('../utils/color')['hexToRgb']>
     readonly inject: UnwrapRef<typeof import('vue')['inject']>
     readonly isLoggedIn: UnwrapRef<typeof import('../utils/auth')['isLoggedIn']>
     readonly isProxy: UnwrapRef<typeof import('vue')['isProxy']>
@@ -276,6 +282,7 @@ declare module 'vue' {
     readonly request: UnwrapRef<typeof import('../utils/request')['default']>
     readonly requireLogin: UnwrapRef<typeof import('../utils/auth')['requireLogin']>
     readonly resolveComponent: UnwrapRef<typeof import('vue')['resolveComponent']>
+    readonly rgbToHex: UnwrapRef<typeof import('../utils/color')['rgbToHex']>
     readonly setAccessToken: UnwrapRef<typeof import('../utils/auth')['setAccessToken']>
     readonly setActivePinia: UnwrapRef<typeof import('pinia')['setActivePinia']>
     readonly setMapStoreSuffix: UnwrapRef<typeof import('pinia')['setMapStoreSuffix']>
@@ -299,6 +306,7 @@ declare module 'vue' {
     readonly useId: UnwrapRef<typeof import('vue')['useId']>
     readonly useMessage: UnwrapRef<typeof import('wot-design-uni')['useMessage']>
     readonly useModel: UnwrapRef<typeof import('vue')['useModel']>
+    readonly useNavigationBar: UnwrapRef<typeof import('../composables/useNavigationBar')['useNavigationBar']>
     readonly useNotify: UnwrapRef<typeof import('wot-design-uni')['useNotify']>
     readonly useRoute: UnwrapRef<typeof import('uni-mini-router')['useRoute']>
     readonly useRouter: UnwrapRef<typeof import('uni-mini-router')['useRouter']>

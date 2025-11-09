@@ -69,7 +69,9 @@
       "type": "page",
       "name": "settings",
       "style": {
-        "navigationBarTitleText": "设置"
+        "navigationBarTitleText": "设置",
+        "navigationBarBackButtonText": "返回",
+        "enablePullDownRefresh": false
       }
     },
     {

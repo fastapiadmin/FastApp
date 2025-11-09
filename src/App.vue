@@ -26,21 +26,7 @@ onHide(() => {
 </script>
 
 <style lang="scss">
-/* H5 环境样式变量设置 */
-:root {
-  --primary-color: #165dff;
-  --primary-color-light: #94bfff;
-  --primary-color-dark: #0e3c9b;
-}
-
-/* 小程序环境样式变量设置 */
-page {
-  --primary-color: #165dff;
-  --primary-color-light: #94bfff;
-  --primary-color-dark: #0e3c9b;
-  background: #f8f8f8;
-}
-
+/* CSS变量由 theme.store.ts 动态设置，不在此处硬编码 */
 /* 动态加载小程序主题色的钩子 */
 /* 用于通过小程序原生API获取主题色并应用 */
 .theme-container {

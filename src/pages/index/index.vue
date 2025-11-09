@@ -13,10 +13,10 @@
     </wd-grid>
 
     <!-- 通知公告 -->
-    <wd-notice-bar text="fastapp 是一个基于 Vue3 + UniApp 的前端模板项目，提供了一套完整的前端解决方案，包括登录、权限、字典、接口请求、状态管理、页面布局、组件封装等功能。"
-      color="#34D19D" type="info">
+    <wd-notice-bar :text="NOTICE_TEXT"
+      color="var(--success-color)" type="info">
       <template #prefix>
-        <wd-tag color="#FAA21E" bg-color="#FAA21E" plain custom-style="margin-right:10rpx">
+        <wd-tag color="var(--warning-color)" bg-color="var(--warning-color)" plain custom-style="margin-right:10rpx">
           通知公告
         </wd-tag>
       </template>
@@ -54,8 +54,7 @@
           <view class="theme-text-primary">访问趋势</view>
           <view>
             <wd-radio-group :value="recentDaysRange" shape="button" inline @change="handleDataRangeChange">
-              <wd-radio :value="7">近7天</wd-radio>
-              <wd-radio :value="15">近15天</wd-radio>
+              <wd-radio v-for="days in DAYS_RANGE_OPTIONS" :key="days" :value="days">近{{ days }}天</wd-radio>
             </wd-radio-group>
           </view>
         </view>
@@ -70,85 +69,36 @@
 
 <script setup lang="ts">
 import { dayjs } from "wot-design-uni";
-
-// 定义访问统计数据类型
-interface VisitStatsVO {
-  todayUvCount: number;
-  uvGrowthRate: number;
-  totalUvCount: number;
-  todayPvCount: number;
-  pvGrowthRate: number;
-  totalPvCount: number;
-}
+import type { VisitStatsVO } from './types';
+import { 
+  SWIPER_LIST, 
+  NAV_LIST, 
+  DEFAULT_VISIT_STATS,
+  NOTICE_TEXT,
+  DEFAULT_DAYS_RANGE,
+  DAYS_RANGE_OPTIONS,
+  CHART_OPTS,
+  CHART_SERIES_NAMES
+} from './data';
 
 const current = ref<number>(0);
 
-const visitStatsData = ref<VisitStatsVO>({
-  todayUvCount: 1234,
-  uvGrowthRate: 15.6,
-  totalUvCount: 45678,
-  todayPvCount: 5678,
-  pvGrowthRate: 23.4,
-  totalPvCount: 123456,
-});
+const visitStatsData = ref<VisitStatsVO>(DEFAULT_VISIT_STATS);
 
 // 图表数据
 const chartData = ref({});
 
-const chartOpts = ref({
-  padding: [20, 0, 20, 0],
-  xAxis: {
-    fontSize: 10,
-    rotateLabel: true,
-    rotateAngle: 30,
-  },
-  yAxis: {
-    disabled: true,
-  },
-  extra: {
-    area: {
-      type: "curve",
-      opacity: 0.2,
-      addLine: true,
-      width: 2,
-      gradient: true,
-      activeType: "hollow",
-    },
-  },
-});
+// 图表配置
+const chartOpts = ref(CHART_OPTS);
 
 // 日期范围
-const recentDaysRange = ref(7);
+const recentDaysRange = ref(DEFAULT_DAYS_RANGE);
 
-const swiperList = ref(["/static/images/banner01.jpg", "/static/images/banner02.jpg"]);
+// 轮播图列表
+const swiperList = ref(SWIPER_LIST);
 
 // 快捷导航列表
-const navList = reactive([
-  {
-    icon: "/static/icons/user.png",
-    title: "用户管理",
-    url: "/pages/work/user/index",
-    prem: "sys:user:query",
-  },
-  {
-    icon: "/static/icons/role.png",
-    title: "角色管理",
-    url: "/pages/work/role/index",
-    prem: "sys:role:query",
-  },
-  {
-    icon: "/static/icons/notice.png",
-    title: "通知公告",
-    url: "/pages/work/notice/index",
-    prem: "sys:notice:query",
-  },
-  {
-    icon: "/static/icons/setting.png",
-    title: "系统配置",
-    url: "/pages/work/config/index",
-    prem: "sys:config:query",
-  },
-]);
+const navList = reactive(NAV_LIST);
 
 // 生成静态的访问趋势数据
 const generateStaticTrendData = (days: number) => {
@@ -179,14 +129,7 @@ const generateStaticTrendData = (days: number) => {
 const loadVisitStatsData = async () => {
   // 模拟异步加载
   setTimeout(() => {
-    visitStatsData.value = {
-      todayUvCount: 1234,
-      uvGrowthRate: 15.6,
-      totalUvCount: 45678,
-      todayPvCount: 5678,
-      pvGrowthRate: 23.4,
-      totalPvCount: 123456,
-    };
+    visitStatsData.value = { ...DEFAULT_VISIT_STATS };
   }, 100);
 };
 
@@ -200,11 +143,11 @@ const loadVisitTrendData = () => {
       categories: data.dates,
       series: [
         {
-          name: "访客数(UV)",
+          name: CHART_SERIES_NAMES.UV,
           data: data.ipList,
         },
         {
-          name: "浏览量(PV)",
+          name: CHART_SERIES_NAMES.PV,
           data: data.pvList,
         },
       ],
@@ -223,6 +166,7 @@ onReady(() => {
   loadVisitStatsData();
   loadVisitTrendData();
 });
+
 
 onShow(() => {
   // 确保 tabbar 状态正确

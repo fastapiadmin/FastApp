@@ -54,7 +54,7 @@
       </wd-cell-group>
 
       <wd-progress v-if="testing" :percentage="progress" stroke-width="6" custom-style="margin: 30rpx 0"
-        color="#4D7FFF" />
+        :color="'var(--primary-color)'" />
 
       <wd-button block type="primary" :loading="testing" custom-class="test-btn" @click="startTest">
         {{ testing ? "测试中..." : "开始测试" }}
@@ -64,7 +64,14 @@
 </template>
 
 <script lang="ts" setup>
+import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request";
+import { useNavigationBar } from "@/composables/useNavigationBar";
+
+const { initNavigationBar } = useNavigationBar();
+
+// 初始化导航栏样式
+initNavigationBar();
 
 interface PingResult {
   delay: string | number;
@@ -228,7 +235,7 @@ onBeforeUnmount(() => {
 }
 
 .text-gray-500 {
-  color: #9e9e9e;
+  color: var(--text-color-3);
 }
 
 .text-sm {

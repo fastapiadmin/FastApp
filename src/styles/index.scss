@@ -43,6 +43,10 @@ body,
   --text-color-placeholder: #c9cdd4;
   --text-color-inverse: #ffffff;
 
+  /* wot-design-uni 兼容变量 */
+  --wot-color-text: #1d2129;
+  --wot-color-dark-color: #ffffff;
+
   /* 背景颜色 */
   --bg-color: #ffffff;
   --bg-color-2: #f8f8f8;
@@ -52,6 +56,9 @@ body,
   /* 边框颜色 */
   --border-color: #e5e6eb;
   --border-color-light: #f2f3f5;
+
+  /* 遮罩颜色 */
+  --mask-color: rgba(0, 0, 0, 0.6);
 
   /* 阴影 */
   --shadow-light: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
@@ -96,6 +103,9 @@ body,
   --text-color-placeholder: #606060;
   --text-color-inverse: #1d2129;
 
+  --wot-color-text: #ffffff;
+  --wot-color-dark-color: #ffffff;
+
   --bg-color: #0f0f0f;
   --bg-color-2: #1a1a1a;
   --bg-color-3: #242424;
@@ -103,6 +113,8 @@ body,
 
   --border-color: #2f2f2f;
   --border-color-light: #3d3d3d;
+
+  --mask-color: rgba(0, 0, 0, 0.8);
 
   --shadow-light: 0 2rpx 8rpx rgba(0, 0, 0, 0.3);
   --shadow-medium: 0 4rpx 16rpx rgba(0, 0, 0, 0.4);
@@ -302,3 +314,53 @@ body,
 .text-2xl {
   font-size: var(--font-xxl) !important;
 }
+
+/* ===== H5 环境下导航栏返回箭头样式 ===== */
+// #ifdef H5
+.uni-page-head__left,
+.uni-page-head__back,
+.uni-page-head__btn-left,
+.uni-page-head__hd {
+  color: var(--wot-color-text) !important;
+  transition: color 0.3s ease;
+}
+
+.wot-theme-dark .uni-page-head__left,
+.wot-theme-dark .uni-page-head__back,
+.wot-theme-dark .uni-page-head__btn-left,
+.wot-theme-dark .uni-page-head__hd {
+  color: var(--wot-color-dark-color) !important;
+}
+
+// 返回图标样式
+.uni-page-head__left .uni-icon,
+.uni-page-head__back .uni-icon,
+.uni-page-head__btn-left .uni-icon,
+.uni-page-head__hd .uni-icon,
+.uni-page-head__left svg,
+.uni-page-head__back svg,
+.uni-page-head__btn-left svg,
+.uni-page-head__hd svg,
+.uni-page-head__left i,
+.uni-page-head__back i,
+.uni-page-head__btn-left i {
+  color: var(--text-color) !important;
+  fill: var(--text-color) !important;
+  transition: color 0.3s ease, fill 0.3s ease;
+}
+
+.wot-theme-dark .uni-page-head__left .uni-icon,
+.wot-theme-dark .uni-page-head__back .uni-icon,
+.wot-theme-dark .uni-page-head__btn-left .uni-icon,
+.wot-theme-dark .uni-page-head__hd .uni-icon,
+.wot-theme-dark .uni-page-head__left svg,
+.wot-theme-dark .uni-page-head__back svg,
+.wot-theme-dark .uni-page-head__btn-left svg,
+.wot-theme-dark .uni-page-head__hd svg,
+.wot-theme-dark .uni-page-head__left i,
+.wot-theme-dark .uni-page-head__back i,
+.wot-theme-dark .uni-page-head__btn-left i {
+  color: var(--text-color) !important;
+  fill: var(--text-color) !important;
+}
+// #endif

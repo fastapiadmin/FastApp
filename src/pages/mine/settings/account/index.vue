@@ -48,7 +48,14 @@
 </template>
 
 <script setup lang="ts">
+import { onLoad } from "@dcloudio/uni-app";
 import UserAPI, { PasswordChangeForm, UserInfo } from "@/api/user";
+import { useNavigationBar } from "@/composables/useNavigationBar";
+
+const { initNavigationBar } = useNavigationBar();
+
+// 初始化导航栏样式
+initNavigationBar();
 
 const validatorConfirmPassword = (value: string) => {
   if (!value) {
@@ -160,4 +167,3 @@ onMounted(() => {
   "layout": "tabbar"
 }</route>
 
-<style lang="scss" scoped></style>

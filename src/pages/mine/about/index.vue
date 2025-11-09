@@ -40,6 +40,12 @@
 </template>
 
 <script lang="ts" setup>
+import { useNavigationBar } from "@/composables/useNavigationBar";
+
+const { initNavigationBar } = useNavigationBar();
+
+// 初始化导航栏样式
+initNavigationBar();
 
 // 系统配置数据
 const webTitle = ref("FastApiAdmin");

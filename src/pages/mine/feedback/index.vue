@@ -46,6 +46,12 @@
 import { checkLogin } from "@/utils/auth";
 import { useToast } from "wot-design-uni";
 import { FormRules } from "wot-design-uni/components/wd-form/types";
+import { useNavigationBar } from "@/composables/useNavigationBar";
+
+const { initNavigationBar } = useNavigationBar();
+
+// 初始化导航栏样式
+initNavigationBar();
 
 const toast = useToast();
 const formRef = ref();

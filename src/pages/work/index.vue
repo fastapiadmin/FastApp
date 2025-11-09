@@ -2,17 +2,21 @@
   <view class="app-container">
     <!-- 页面标题 -->
     <view class="page-header">
-      <text class="page-title theme-text-primary">工作台</text>
-      <text class="page-subtitle theme-text-secondary">欢迎回来～</text>
+      <text class="page-title">工作台</text>
+      <text class="page-subtitle">欢迎回来～</text>
     </view>
 
     <!-- 统计卡片 -->
     <wd-card class="stats-section">
       <view class="stats-grid">
-        <view v-for="(item, index) in statsData" :key="index" class="stats-card theme-card"
-          @click="handleStatClick(item)">
-          <view class="stats-icon" :style="{ background: item.iconBgColor }">
-            <wd-icon :name="item.icon" size="24" />
+        <view 
+          v-for="(item, index) in statsData" 
+          :key="index" 
+          class="stats-card theme-card"
+          @click="handleStatClick(item)"
+        >
+          <view class="stats-icon">
+            <wd-icon :name="item.icon" size="24" :color="item.color" />
           </view>
           <view class="stats-content">
             <text class="stats-number theme-text-primary">{{ item.number }}</text>
@@ -25,9 +29,16 @@
     <!-- 快捷操作 -->
     <wd-card title="快捷操作">
       <wd-grid :column="4" border>
-        <wd-grid-item v-for="(action, index) in quickActions" :key="index" :icon="action.icon" :text="action.name"
-          icon-size="20" custom-class="custom-item" @click="handleActionClick(action)">
-        </wd-grid-item>
+        <wd-grid-item 
+          v-for="(action, index) in quickActions" 
+          :key="index" 
+          :icon="action.icon" 
+          :text="action.name"
+          :icon-color="primaryColor"
+          icon-size="20" 
+          custom-class="custom-item" 
+          @click="handleActionClick(action)"
+        />
       </wd-grid>
     </wd-card>
 
@@ -44,74 +55,52 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
+import { useThemeStore } from "@/store/modules/theme.store";
+import { useNavigationBar } from "@/composables/useNavigationBar";
+import type { StatItem, QuickAction, Activity } from './types';
+import { STATS_CONFIG, QUICK_ACTIONS, RECENT_ACTIVITIES } from './data';
 
-// 统计数据
-const statsData = ref([
-  {
-    number: '1,234',
-    label: '用户总数',
-    color: '#165DFF',
-    iconBgColor: '#e1efff',
-    icon: 'user',
-    path: '/pages/user/index'
-  },
-  {
-    number: '856',
-    label: '今日活跃',
-    color: '#00B42A',
-    iconBgColor: '#e1fcef',
-    icon: 'app',
-    path: '/pages/user/active'
-  },
-  {
-    number: '42',
-    label: '待处理',
-    color: '#FF7D00',
-    iconBgColor: '#fff0e1',
-    icon: 'chart',
-    path: '/pages/order/pending'
-  },
-  {
-    number: '8',
-    label: '系统消息',
-    color: '#F53F3F',
-    iconBgColor: '#ffe1e1',
-    icon: 'warning',
-    path: '/pages/message/index'
-  }
-])
+const themeStore = useThemeStore();
+const { initNavigationBar } = useNavigationBar();
 
+// 初始化导航栏样式
+initNavigationBar();
+
+// ===== 计算属性 =====
+// 主题色
+const primaryColor = computed(() => themeStore.currentThemeColor.primary);
+
+// 统计数据 - 使用主题色适配
+const statsData = computed<StatItem[]>(() => {
+  const color = primaryColor.value;
+  return STATS_CONFIG.map(item => ({
+    ...item,
+    color
+  }));
+});
+
+// ===== 数据定义 =====
 // 快捷操作
-const quickActions = ref([
-  { name: '用户管理', icon: 'user', path: '/pages/user/index' },
-  { name: '角色管理', icon: 'usergroup', path: '/pages/role/index' },
-  { name: '部门管理', icon: 'fork', path: '/pages/dept/index' },
-  { name: '系统设置', icon: 'setting', path: '/pages/settings/index' }
-])
+const quickActions = QUICK_ACTIONS;
 
 // 最近动态
-const recentActivities = ref([
-  { title: '新用户注册', label: '李四', value: '刚刚' },
-  { title: '订单完成', label: '宫保鸡丁', value: '3分钟前' },
-  { title: '系统更新', label: '版本v2.1.1', value: '8分钟前' },
-  { title: '用户反馈', label: '界面优化建议', value: '12分钟前' }
-])
+const recentActivities = RECENT_ACTIVITIES;
 
-// 处理方法
-const handleStatClick = (item: any) => {
+// ===== 事件处理 =====
+const handleStatClick = (item: StatItem) => {
   uni.showToast({
     title: `点击了 ${item.label}`,
     icon: 'none'
-  })
-}
+  });
+};
 
-const handleActionClick = (action: any) => {
+const handleActionClick = (action: QuickAction) => {
   uni.showToast({
     title: `跳转到 ${action.name}`,
     icon: 'none'
-  })
-}
+  });
+};
 </script>
 
 <route lang="json">{
@@ -127,22 +116,29 @@ const handleActionClick = (action: any) => {
 
 <style lang="scss" scoped>
 .page-header {
-  margin-bottom: 40rpx;
+  padding: 40rpx 20rpx;
+  margin-bottom: 30rpx;
   text-align: center;
+  border-radius: 16rpx;
+  // 使用与"我的"页面相同的渐变背景
+  background: linear-gradient(135deg, var(--wot-color-theme, #165dff) 0%, #667eea 100%);
 
   .page-title {
-    margin-bottom: 8rpx;
+    display: block;
+    margin-bottom: 10rpx;
     font-size: 36rpx;
     font-weight: bold;
+    color: var(--text-color-inverse);
   }
 
   .page-subtitle {
-    font-size: 28rpx;
+    font-size: 26rpx;
+    color: var(--text-color-inverse);
+    opacity: 0.8;
   }
 }
 
 .stats-section {
-
   .stats-grid {
     padding: 12rpx;
     display: grid;
@@ -171,7 +167,6 @@ const handleActionClick = (action: any) => {
       width: 60rpx;
       height: 60rpx;
       margin-right: 20rpx;
-      border-radius: 12rpx;
     }
 
     .stats-content {
@@ -193,7 +188,4 @@ const handleActionClick = (action: any) => {
   }
 }
 
-.quick-actions {
-  margin-bottom: 40rpx;
-}
 </style>

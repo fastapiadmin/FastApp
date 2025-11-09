@@ -1,7 +1,7 @@
 <template>
   <view :key="renderKey" class="app-container dark:text-[var(--wot-dark-color)]">
     <!-- 页面标题 -->
-    <view class="page-header">
+    <view class="page-header" :style="pageHeaderStyle">
       <text class="page-title">主题设置</text>
       <text class="page-subtitle">个性化您的应用外观</text>
     </view>
@@ -24,7 +24,7 @@
             :class="{ active: isActiveColor(color) }" 
             @click="selectColor(color)">
             <view class="color-preview" :style="{ backgroundColor: color.primary }">
-              <wd-icon v-if="isActiveColor(color)" name="check" size="20" color="#fff" />
+              <wd-icon v-if="isActiveColor(color)" name="check" size="20" :color="'var(--text-color-inverse)'" />
             </view>
             <text class="color-name">{{ color.name }}</text>
           </view>
@@ -42,10 +42,27 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, watch,ref } from "vue";
+import { computed, watch, ref } from "vue";
 import { useThemeStore } from "@/store/modules/theme.store";
+import { useNavigationBar } from "@/composables/useNavigationBar";
+import { adjustColorBrightness } from "@/utils/color";
 
 const themeStore = useThemeStore();
+const { initNavigationBar } = useNavigationBar();
+
+// 初始化导航栏样式
+initNavigationBar();
+
+// 页面头部样式（使用内联样式确保颜色立即更新）
+const pageHeaderStyle = computed(() => {
+  const primaryColor = themeStore.currentThemeColor.primary;
+  // 计算深色变体（变暗约 0.6 倍）
+  const primaryColorDark = adjustColorBrightness(primaryColor, 0.6);
+  return {
+    background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColorDark} 100%)`
+  };
+});
+
 const isDarkMode = computed({
   get: () => themeStore.isDark,
   set: (value) => {
@@ -133,7 +150,6 @@ watch(() => themeStore.themeVars.colorTheme, () => {
   padding: 40rpx 20rpx;
   margin-bottom: 30rpx;
   text-align: center;
-  background: linear-gradient(135deg, var(--wot-color-theme, #4D7FFF) 0%, #667eea 100%);
   border-radius: 16rpx;
 
   .page-title {
@@ -141,12 +157,13 @@ watch(() => themeStore.themeVars.colorTheme, () => {
     margin-bottom: 10rpx;
     font-size: 36rpx;
     font-weight: bold;
-    color: #fff;
+    color: var(--text-color-inverse);
   }
 
   .page-subtitle {
     font-size: 26rpx;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-color-inverse);
+    opacity: 0.8;
   }
 }
 
@@ -158,7 +175,7 @@ watch(() => themeStore.themeVars.colorTheme, () => {
   display: flex;
   align-items: center;
   padding: 30rpx 30rpx 20rpx;
-  border-bottom: 1rpx solid var(--wot-color-border, #f0f0f0);
+  border-bottom: 1rpx solid var(--border-color-light);
 
   .setting-title {
     font-size: 32rpx;

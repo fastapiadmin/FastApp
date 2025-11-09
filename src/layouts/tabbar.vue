@@ -63,4 +63,15 @@ export default {
 .wot-theme-dark.page-wrapper {
   background-color: var(--bg-color);
 }
+
+// 确保 tabbar 在暗黑模式下有正确的背景色
+:deep(.wd-tabbar) {
+  background-color: var(--wot-color-bg-container);
+  transition: background-color 0.3s ease;
+}
+
+.wot-theme-dark :deep(.wd-tabbar) {
+  background-color: var(--wot-color-dark-background);
+  border-top-color: var(--wot-color-dark-border-color);
+}
 </style>

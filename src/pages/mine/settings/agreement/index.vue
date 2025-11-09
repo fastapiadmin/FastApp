@@ -23,6 +23,14 @@
 </template>
 
 <script lang="ts" setup>
+import { onLoad } from "@dcloudio/uni-app";
+import { useNavigationBar } from "@/composables/useNavigationBar";
+
+const { initNavigationBar } = useNavigationBar();
+
+// 初始化导航栏样式
+initNavigationBar();
+
 const activeNames = ref(["0"]); // 默认展开第一项
 
 const agreementContent = [
@@ -80,4 +88,3 @@ const handleAgree = () => {
   "layout": "tabbar"
 }</route>
 
-<style lang="scss" scoped></style>

@@ -29,12 +29,18 @@
 </template>
 
 <script lang="ts" setup>
+import { computed, ref } from "vue";
 import { useUserStore } from "@/store/modules/user.store";
 import { checkLogin } from "@/utils/auth";
 import { onLoad } from "@dcloudio/uni-app";
+import { useNavigationBar } from "@/composables/useNavigationBar";
 
 const userStore = useUserStore();
 const isLogin = computed(() => !!userStore.userInfo);
+const { initNavigationBar } = useNavigationBar();
+
+// 初始化导航栏样式
+initNavigationBar();
 
 // 个人资料
 const navigateToProfile = () => {
@@ -191,7 +197,7 @@ const handleLogout = () => {
   });
 };
 
-// 检查登录状态
+// 页面加载时初始化
 onLoad(() => {
   getCacheSize();
 });
@@ -201,12 +207,58 @@ onLoad(() => {
 {
   "name": "settings",
   "style": {
-    "navigationBarTitleText": "设置"
+    "navigationBarTitleText": "设置",
+    "navigationBarBackButtonText": "返回",
+    "enablePullDownRefresh": false
   }
 }
 </route>
 
-<style lang="scss" scoped>
+<style lang="scss">
+// H5 环境下导航栏样式 - 使用系统主题变量
+// #ifdef H5
+.uni-page-head {
+  background-color: var(--card-bg-color) !important;
+  border-bottom-color: var(--border-color) !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.wot-theme-dark .uni-page-head {
+  background-color: var(--bg-color) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+
+.uni-page-head__title {
+  color: var(--text-color) !important;
+  transition: color 0.3s ease;
+}
+
+.wot-theme-dark .uni-page-head__title {
+  color: var(--text-color) !important;
+}
+
+.uni-page-head__btn {
+  color: var(--text-color) !important;
+  transition: color 0.3s ease;
+}
+
+.wot-theme-dark .uni-page-head__btn {
+  color: var(--text-color) !important;
+}
+
+// #endif
+
+.app-container {
+  min-height: 100vh;
+  background-color: var(--card-bg-color);
+  transition: background-color 0.3s ease;
+}
+
+// 暗黑模式支持
+.wot-theme-dark .app-container {
+  background-color: var(--bg-color);
+}
+
 .logout-section {
   display: flex;
   align-items: center;
@@ -223,12 +275,12 @@ onLoad(() => {
   height: 90rpx;
   font-size: 32rpx;
   font-weight: 500;
-  color: #fff;
-  background-color: var(--wot-color-theme, var(--primary-color));
+  color: var(--text-color-inverse);
+  background-color: var(--primary-color);
   border: none;
   border-radius: 45rpx;
-  box-shadow: 0 4rpx 12rpx rgba(22, 93, 255, 0.3);
-  transition: opacity 0.2s;
+  box-shadow: var(--shadow-medium);
+  transition: opacity 0.2s, background-color 0.3s ease;
 
   &:active {
     opacity: 0.85;
@@ -240,7 +292,7 @@ onLoad(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: var(--mask-color);
   border-radius: 12rpx;
 }
 
@@ -250,7 +302,7 @@ onLoad(() => {
 
 :deep(.loading-center .wd-loading__text) {
   margin-top: 20rpx;
-  color: #fff;
+  color: var(--text-color-inverse);
   text-align: center;
 }
 </style>

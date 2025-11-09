@@ -1,5 +1,5 @@
 <template>
-  <view :key="renderKey" class="app-container">
+  <view v-if="isThemeReady" :key="renderKey" class="app-container">
     <!-- 用户信息卡片 -->
     <view class="user-profile theme-card">
       <view class="blur-bg"></view>
@@ -19,12 +19,22 @@
           </block>
         </view>
         <view class="actions">
-          <view class="action-btn" @click="navigateToSettings">
-            <wd-icon name="setting1" size="22" :color="themeVars.darkColor3" />
+          <view 
+            class="action-btn action-btn-settings" 
+            @click="handleSettingsClick"
+            @tap="handleSettingsClick"
+          >
+            <text class="debug-text">⚙️</text>
+            <wd-icon name="setting1" size="22" color="#a0a0a0" />
           </view>
-          <view v-if="isLogin" class="action-btn" @click="navigateToSection('messages')">
+          <view 
+            v-if="isLogin" 
+            class="action-btn action-btn-messages" 
+            @click="handleMessagesClick"
+            @tap="handleMessagesClick"
+          >
             <wd-badge v-if="true" modelValue="99+">
-              <wd-icon name="notification" size="22" :color="themeVars.darkColor3" />
+              <wd-icon name="notification" size="22" color="#a0a0a0" />
             </wd-badge>
           </view>
         </view>
@@ -146,17 +156,86 @@ import { useToast } from "wot-design-uni";
 import { useRouter } from "uni-mini-router";
 import { useUserStore } from "@/store";
 import { useThemeStore } from "@/store/modules/theme.store";
-import { computed, ref, onMounted, onUnmounted } from "vue";
+import { computed, ref, onMounted, onUnmounted, watch } from "vue";
 
 const toast = useToast();
 const userStore = useUserStore();
 const themeStore = useThemeStore();
-const themeVars = computed(() => themeStore.themeVars);
-// 修复: 直接返回主题色对象，确保可以访问primary属性
-const currentThemeColor = computed(() => themeStore.currentThemeColor || { primary: '#4D7FFF' });
 
 // 强制重新渲染的key
 const renderKey = ref(0);
+
+// 主题是否已准备好
+const isThemeReady = ref(true); // 立即设置为 true，因为 themeVars computed 已经有默认值保护
+
+// 默认主题变量对象
+const defaultThemeVars = {
+  darkColor3: '#a0a0a0',
+  darkColor: '#ffffff',
+  darkColor2: '#e0e0e0',
+  colorTheme: '#4D7FFF',
+  colorBg: '#f8f8f8',
+  colorTitle: '#1d2129',
+  colorContent: '#4e5969',
+  colorSecondary: '#86909c',
+  colorBorder: '#e5e6eb',
+  colorBorderLight: '#f2f3f5',
+  cardBg: '#ffffff',
+  cardTitleColor: '#1d2129',
+  cardContentColor: '#4e5969',
+  cardContentBorderColor: '#e5e6eb',
+};
+
+// 主题变量，确保始终有默认值
+const themeVars = computed(() => {
+  try {
+    const vars = themeStore?.themeVars;
+    // 如果 themeVars 不存在，返回默认值对象
+    if (!vars) {
+      return defaultThemeVars;
+    }
+    // 确保所有必需的属性都有值
+    return {
+      ...defaultThemeVars,
+      ...vars,
+      darkColor3: vars.darkColor3 || defaultThemeVars.darkColor3,
+      colorTheme: vars.colorTheme || defaultThemeVars.colorTheme,
+    };
+  } catch (error) {
+    // 静默失败，使用默认值
+    return defaultThemeVars;
+  }
+});
+
+// 图标颜色，确保始终有值
+const iconColor = computed(() => {
+  return themeVars.value?.darkColor3 || '#a0a0a0';
+});
+
+// 修复: 直接返回主题色对象，确保可以访问primary属性
+const currentThemeColor = computed(() => {
+  try {
+    const color = themeStore?.currentThemeColor;
+    return color || { primary: '#4D7FFF', name: '默认蓝', value: 'blue' };
+  } catch (error) {
+    // 静默失败，使用默认值
+    return { primary: '#4D7FFF', name: '默认蓝', value: 'blue' };
+  }
+});
+
+// 确保 themeStore 已初始化
+onMounted(() => {
+  try {
+    // 强制初始化主题
+    if (!themeStore.themeVars) {
+      themeStore.initTheme();
+    } else if (!themeStore.themeVars.darkColor3) {
+      themeStore.initTheme();
+    }
+  } catch (error) {
+    // 即使初始化失败，themeVars computed 也会返回默认值
+  }
+});
 
 const userInfo = computed(() => userStore.userInfo);
 const isLogin = computed(() => !!userInfo.value);
@@ -220,9 +299,28 @@ const navigateToAbout = () => {
   router.push({ path: "/pages/mine/about/index" });
 };
 
+// 设置按钮点击处理
+const handleSettingsClick = (e?: any) => {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  navigateToSettings();
+};
+
 // 设置
 const navigateToSettings = () => {
+  // 使用 router.push，与其他页面保持一致
   router.push({ path: "/pages/mine/settings/index" });
+};
+
+// 消息按钮点击处理
+const handleMessagesClick = (e?: any) => {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  navigateToSection('messages');
 };
 
 // 问题反馈
@@ -231,8 +329,11 @@ const handleQuestionFeedback = () => {
 };
 
 // 导航到各个板块
-const navigateToSection = (section: string, subSection?: string) => {
-  console.log(`导航到: ${section}${subSection ? ` - ${subSection}` : ""}`);
+const navigateToSection = (section: string, subSection?: string, e?: any) => {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
   // 这里可以根据需要实现具体的导航逻辑
   uni.showToast({
     title: "功能开发中",
@@ -348,18 +449,53 @@ watch(
 
     .actions {
       display: flex;
+      position: relative;
+      z-index: 100;
+      flex-shrink: 0;
 
       .action-btn {
         position: relative;
-        display: flex;
+        display: flex !important;
         align-items: center;
         justify-content: center;
         width: 70rpx;
         height: 70rpx;
+        min-width: 70rpx;
+        min-height: 70rpx;
         margin-left: 16rpx;
-        background-color: rgba(255, 255, 255, 0.9);
+        background-color: rgba(255, 255, 255, 0.9) !important;
         border-radius: 50%;
         box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+        cursor: pointer;
+        z-index: 101;
+        pointer-events: auto;
+        
+        .debug-text {
+          position: absolute;
+          font-size: 20rpx;
+          z-index: 103;
+        }
+        
+        // 确保图标可见
+        :deep(.wd-icon) {
+          display: block !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+          color: #a0a0a0 !important;
+          position: relative;
+          z-index: 102;
+        }
+        
+        &:active {
+          opacity: 0.7;
+          transform: scale(0.95);
+        }
+        
+        // 设置按钮特殊样式
+        &.action-btn-settings {
+          z-index: 102;
+          border: 2rpx solid rgba(160, 160, 160, 0.3);
+        }
       }
     }
   }
