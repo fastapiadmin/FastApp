@@ -245,7 +245,7 @@ API 请求封装在 `src/api` 目录，使用 uni-app 的 `uni.request` 进行�
 
 ```env
 # API 基础地址
-VITE_API_BASE_URL=http://localhost:8000
+VITE_API_BASE_URL=http://localhost:8001
 
 # API 前缀
 VITE_APP_BASE_API=/api
