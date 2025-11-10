@@ -7,9 +7,10 @@ import UniPages from "@uni-helper/vite-plugin-uni-pages";
 import Components from "@uni-helper/vite-plugin-uni-components";
 import { WotResolver } from "@uni-helper/vite-plugin-uni-components/resolvers";
 
+import UnoCss from "unocss/vite";
+
 export default defineConfig(
-  async ({ mode }: ConfigEnv): Promise<UserConfig> => {
-    const UnoCss = await import("unocss/vite").then((i) => i.default);
+  ({ mode }: ConfigEnv): UserConfig => {
     const env = loadEnv(mode, process.cwd());
 
     return {

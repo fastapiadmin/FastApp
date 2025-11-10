@@ -80,15 +80,20 @@
 import { computed, ref } from "vue";
 import { useUserStore } from "@/store/modules/user.store";
 import { checkLogin } from "@/utils/auth";
-import { onLoad } from "@dcloudio/uni-app";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import { useNavigationBar } from "@/composables/useNavigationBar";
 
 const userStore = useUserStore();
 const isLogin = computed(() => !!userStore.userInfo);
-const { initNavigationBar } = useNavigationBar();
+const { initNavigationBar, setNavigationBarStyle } = useNavigationBar();
 
 // 初始化导航栏样式
 initNavigationBar();
+
+// 页面显示时重新设置导航栏样式
+onShow(() => {
+  setNavigationBarStyle();
+});
 
 // 个人资料
 const navigateToProfile = () => {
