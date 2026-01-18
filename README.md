@@ -33,15 +33,15 @@ FastApp 是 FastapiAdmin 项目的移动端应用，基于 uni-app 框架开发�
 
 | 平台       | 仓库地址                                                                                                                                                                                         |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **GitHub** | [FastapiAdmin主工程](https://github.com/1014TaoTao/FastapiAdmin.git) \| [FastDocs官网](https://github.com/1014TaoTao/FastDocs.git) \| [FastApp移动端](https://github.com/1014TaoTao/FastApp.git) |
-| **Gitee**  | [FastapiAdmin主工程](https://gitee.com/tao__tao/FastapiAdmin.git) \| [FastDocs官网](https://gitee.com/tao__tao/FastDocs.git) \| [FastApp移动端](https://gitee.com/tao__tao/FastApp.git)          |
+| **GitHub** | [FastapiAdmin主工程](https://github.com/fastapiadmin/FastapiAdmin.git) \| [FastDocs官网](https://github.com/fastapiadmin/FastDocs.git) \| [FastApp移动端](https://github.com/fastapiadmin/FastApp.git) |
+| **Gitee**  | [FastapiAdmin主工程](https://gitee.com/fastapiadmin/FastapiAdmin.git) \| [FastDocs官网](https://gitee.com/fastapiadmin/FastDocs.git) \| [FastApp移动端](https://gitee.com/fastapiadmin/FastApp.git)          |
 
 ## 📸 项目截图
 
 | 模块     | 详情                                                                                       | 模块     | 详情                                                                                   | 模块       | 详情                                                                                    |
 | -------- | ------------------------------------------------------------------------------------------ | -------- | -------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------- |
-| **登录** | ![移动端登录](https://gitee.com/tao__tao/FastDocs/raw/main/src/public/app_login.png)       | **首页** | ![移动端首页](https://gitee.com/tao__tao/FastDocs/raw/main/src/public/app_home.png)    | **我的**   | ![移动端个人中心](https://gitee.com/tao__tao/FastDocs/raw/main/src/public/app_mine.png) |
-| **个人** | ![移动端个人信息](https://gitee.com/tao__tao/FastDocs/raw/main/src/public/app_profile.png) | **设置** | ![移动端设置](https://gitee.com/tao__tao/FastDocs/raw/main/src/public/app_setting.png) | **工作台** | ![移动端工作台](https://gitee.com/tao__tao/FastDocs/raw/main/src/public/app_work.png)   |
+| **登录** | ![移动端登录](https://gitee.com/fastapiadmin/FastDocs/raw/main/src/public/app_login.png)       | **首页** | ![移动端首页](https://gitee.com/fastapiadmin/FastDocs/raw/main/src/public/app_home.png)    | **我的**   | ![移动端个人中心](https://gitee.com/fastapiadmin/FastDocs/raw/main/src/public/app_mine.png) |
+| **个人** | ![移动端个人信息](https://gitee.com/fastapiadmin/FastDocs/raw/main/src/public/app_profile.png) | **设置** | ![移动端设置](https://gitee.com/fastapiadmin/FastDocs/raw/main/src/public/app_setting.png) | **工作台** | ![移动端工作台](https://gitee.com/fastapiadmin/FastDocs/raw/main/src/public/app_work.png)   |
 
 ## ✨ 功能特性
 
