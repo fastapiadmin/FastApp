@@ -1,5 +1,3 @@
-# FastApp - 移动端跨平台应用
-
 <div align="center">
   <p align="center">
     <img src="https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/logo.png" width="150" height="150" alt="logo" />
