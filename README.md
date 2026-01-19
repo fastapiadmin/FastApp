@@ -35,10 +35,9 @@ FastApp 是 FastapiAdmin 项目的移动端应用，基于 uni-app 框架开发�
 
 ## 📸 项目截图
 
-| 模块     | 详情                                                                                       | 模块     | 详情                                                                                   | 模块       | 详情                                                                                    |
-| -------- | ------------------------------------------------------------------------------------------ | -------- | -------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------- |
-| **登录** | ![移动端登录](https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/app_login.png)       | **首页** | ![移动端首页](https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/app_home.png)    | **我的**   | ![移动端个人中心](https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/app_mine.png) |
-| **个人** | ![移动端个人信息](https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/app_profile.png) | **设置** | ![移动端设置](https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/app_setting.png) | **工作台** | ![移动端工作台](https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/app_work.png)   |
+| 登录 <div style="width:60px"/> | 首页 <div style="width:60px"/> | 个人中心 <div style="width:60px"/> |
+|----------|----------|----------|
+| ![移动端登录](https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/app_login.png) | ![移动端首页](https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/app_home.png) | ![移动端个人中心](https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/app_mine.png) |
 
 ## ✨ 功能特性
 
