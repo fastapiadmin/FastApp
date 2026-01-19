@@ -4,7 +4,7 @@
   <p align="center">
     <img src="https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/logo.png" width="150" height="150" alt="logo" />
   </p>
-  <h1>FastApiAdmin <sup style="background-color: #28a745; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.4em; vertical-align: super; margin-left: 5px;">v2.0.0</h1>
+  <h1>FastApp <sup style="background-color: #28a745; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.4em; vertical-align: super; margin-left: 5px;">v2.0.0</h1>
   <h3>FastApp 基于 uni-app + Vue 3 + TypeScript 的现代化移动端跨平台开发模板</h3>
   <p>如果你喜欢这个项目，给个 ⭐️ 支持一下吧！</p>
   <p align="center">
