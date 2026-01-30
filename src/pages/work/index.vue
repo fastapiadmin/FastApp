@@ -1,196 +1,137 @@
-<template>
-  <view class="app-container">
-    <!-- 页面标题 -->
-    <view class="page-header">
-      <text class="page-title">工作台</text>
-      <text class="page-subtitle">欢迎回来～</text>
-    </view>
-
-    <!-- 统计卡片 -->
-    <wd-card class="stats-section">
-      <view class="stats-grid">
-        <view
-          v-for="(item, index) in statsData"
-          :key="index"
-          class="stats-card theme-card"
-          @click="handleStatClick(item)"
-        >
-          <view class="stats-icon">
-            <wd-icon :name="item.icon" size="24" :color="item.color" />
-          </view>
-          <view class="stats-content">
-            <text class="stats-number theme-text-primary">{{ item.number }}</text>
-            <text class="stats-label theme-text-secondary">{{ item.label }}</text>
-          </view>
-        </view>
-      </view>
-    </wd-card>
-
-    <!-- 快捷操作 -->
-    <wd-card title="快捷操作">
-      <wd-grid :column="4" border>
-        <wd-grid-item
-          v-for="(action, index) in quickActions"
-          :key="index"
-          :icon="action.icon"
-          :text="action.name"
-          :icon-color="primaryColor"
-          icon-size="20"
-          custom-class="custom-item"
-          @click="handleActionClick(action)"
-        />
-      </wd-grid>
-    </wd-card>
-
-    <!-- 最近动态 -->
-    <wd-card title="最近动态">
-      <wd-cell-group>
-        <wd-cell
-          v-for="(activity, index) in recentActivities"
-          :key="index"
-          :title="activity.title"
-          :label="activity.label"
-          :value="activity.value"
-          custom-class="activity-cell"
-        ></wd-cell>
-      </wd-cell-group>
-    </wd-card>
-  </view>
-</template>
-
 <script setup lang="ts">
-import { computed } from "vue";
-import { useThemeStore } from "@/store/modules/theme.store";
-import { useNavigationBar } from "@/composables/useNavigationBar";
-import type { StatItem, QuickAction } from "./types";
-import { STATS_CONFIG, QUICK_ACTIONS, RECENT_ACTIVITIES } from "./data";
+definePage({
+  name: 'work',
+  layout: 'tabbar',
+  style: {
+    navigationBarTitleText: '工作台',
+  },
+})
 
-const themeStore = useThemeStore();
-const { initNavigationBar } = useNavigationBar();
+const router = useRouter()
+const {
+  theme,
+  toggleTheme,
+  currentThemeColor,
+  showThemeColorSheet,
+  themeColorOptions,
+  openThemeColorPicker,
+  closeThemeColorPicker,
+  selectThemeColor,
+  setFollowSystem,
+} = useManualTheme()
 
-// 初始化导航栏样式
-initNavigationBar();
+const isDark = computed({
+  get() {
+    return theme.value === 'dark'
+  },
+  set() {
+    toggleTheme()
+  },
+})
 
-// ===== 计算属性 =====
-// 主题色
-const primaryColor = computed(() => themeStore.currentThemeColor.primary);
+// 页面跳转方法
+function navigateTo(name: string) {
+  router.push({
+    name,
+  })
+}
 
-// 统计数据 - 使用主题色适配
-const statsData = computed<StatItem[]>(() => {
-  const color = primaryColor.value;
-  return STATS_CONFIG.map((item) => ({
-    ...item,
-    color,
-  }));
-});
+// 处理主题色选择
+function handleThemeColorSelect(option: any) {
+  selectThemeColor(option)
+}
 
-// ===== 数据定义 =====
-// 快捷操作
-const quickActions = QUICK_ACTIONS;
-
-// 最近动态
-const recentActivities = RECENT_ACTIVITIES;
-
-// ===== 事件处理 =====
-const handleStatClick = (item: StatItem) => {
-  uni.showToast({
-    title: `点击了 ${item.label}`,
-    icon: "none",
-  });
-};
-
-const handleActionClick = (action: QuickAction) => {
-  uni.showToast({
-    title: `跳转到 ${action.name}`,
-    icon: "none",
-  });
-};
+function openUrl(url: string) {
+  window.open(url, '_blank')
+}
 </script>
 
-<route lang="json">
-{
-  "name": "work",
-  "style": {
-    "navigationStyle": "custom"
-  },
-  "layout": "tabbar",
-  "meta": {
-    "requireAuth": true
-  }
-}
-</route>
+<template>
+  <view class="box-border py-3">
+    <view class="mx-3 box-border rounded-3 bg-white px-4 py-6 text-center dark:bg-[var(--wot-dark-background2)]">
+      <text class="mb-3 block text-left text-5 text-gray-800 font-bold dark:text-gray-200">
+        Wot Starter
+      </text>
+      <text class="mb-3 block text-left text-30rpx text-gray-600 leading-relaxed dark:text-gray-300">
+        ⚡️ 基于 vitesse-uni-app 由 vite & uni-app 驱动的、深度整合 Wot UI 组件库的快速启动模板
+      </text>
+      <text class="block text-left text-3 text-gray-400 leading-relaxed dark:text-gray-400">
+        背靠 Uni Helper、Wot UI 团队，告别 HBuilderX ，拥抱现代前端开发工具链
+      </text>
+    </view>
 
-<style lang="scss" scoped>
-.page-header {
-  padding: 40rpx 20rpx;
-  margin-bottom: 30rpx;
-  text-align: center;
-  // 使用与"我的"页面相同的渐变背景
-  background: linear-gradient(135deg, var(--wot-color-theme, #165dff) 0%, #667eea 100%);
-  border-radius: 16rpx;
+    <demo-block title="基础设置" transparent>
+      <wd-cell-group border custom-class="rounded-2! overflow-hidden">
+        <wd-cell title="暗黑模式">
+          <wd-switch v-model="isDark" size="18px" />
+        </wd-cell>
+        <wd-cell title="跟随系统">
+          <wd-button size="small" @click="setFollowSystem">
+            跟随系统
+          </wd-button>
+        </wd-cell>
+        <wd-cell title="选择主题色" is-link @click="openThemeColorPicker">
+          <view class="flex items-center justify-end gap-2">
+            <view
+              class="h-4 w-4 rounded-full"
+              :style="{ backgroundColor: currentThemeColor.primary }"
+            />
+            <text>{{ currentThemeColor.name }}</text>
+          </view>
+        </wd-cell>
+      </wd-cell-group>
+    </demo-block>
 
-  .page-title {
-    display: block;
-    margin-bottom: 10rpx;
-    font-size: 36rpx;
-    font-weight: bold;
-    color: var(--text-color-inverse);
-  }
+    <demo-block title="工具链介绍" transparent>
+      <wd-cell-group border custom-class="rounded-2! overflow-hidden">
+        <wd-cell title="🧩 WotUI组件库" is-link @click="openUrl('https://wot-ui.cn/')" />
+        <wd-cell title="🧠 Agent Skills" is-link @click="navigateTo('skills')" />
 
-  .page-subtitle {
-    font-size: 26rpx;
-    color: var(--text-color-inverse);
-    opacity: 0.8;
-  }
-}
+        <wd-cell title="🚦 Router 路由管理" is-link @click="navigateTo('router')" />
+        <wd-cell title="🌐 Alova 网络请求" is-link @click="navigateTo('request')" />
+        <wd-cell title="🎨 Icon 图标" is-link @click="navigateTo('icon')" />
+        <wd-cell title="✨ Unocss 原子化" is-link @click="navigateTo('styles')" />
+        <wd-cell title="🍍 Pinia 持久化" is-link @click="navigateTo('pinia')" />
+        <wd-cell title="💬 Fedback 反馈组件" is-link @click="navigateTo('feedback')" />
+        <wd-cell title="🌱 CreateUni 脚手架" is-link @click="navigateTo('create-uni') " />
+        <wd-cell title="🔄 CI/CD 持续集成" is-link @click="navigateTo('ci')" />
+        <wd-cell title="🦾  uni-ku/root" is-link @click="navigateTo('root')" />
+        <wd-cell title="📊 uni-echarts" is-link @click="navigateTo('echarts')" />
+      </wd-cell-group>
+    </demo-block>
 
-.stats-section {
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12rpx;
-    padding: 12rpx;
-  }
-
-  .stats-card {
-    display: flex;
-    align-items: center;
-    padding: 30rpx;
-    background: var(--card-bg);
-    border: 1rpx solid var(--border-color);
-    border-radius: 16rpx;
-    box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-
-    &:active {
-      transform: scale(0.95);
-    }
-
-    .stats-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 60rpx;
-      height: 60rpx;
-      margin-right: 20rpx;
-    }
-
-    .stats-content {
-      flex: 1;
-
-      .stats-number {
-        display: block;
-        margin-bottom: 4rpx;
-        font-size: 32rpx;
-        font-weight: bold;
-        color: var(--text-color);
-      }
-
-      .stats-label {
-        font-size: 24rpx;
-        color: var(--text-color-2);
-      }
-    }
-  }
-}
-</style>
+    <!-- 主题色选择 ActionSheet -->
+    <wd-action-sheet
+      v-model="showThemeColorSheet"
+      title="选择主题色"
+      :close-on-click-action="true"
+      @cancel="closeThemeColorPicker"
+    >
+      <view class="px-4 pb-4">
+        <view
+          v-for="option in themeColorOptions"
+          :key="option.value"
+          class="flex items-center justify-between border-b border-gray-100 py-3 last:border-b-0 dark:border-gray-700"
+          @click="handleThemeColorSelect(option)"
+        >
+          <view class="flex items-center gap-3">
+            <view
+              class="h-6 w-6 border-2 border-gray-200 rounded-full dark:border-gray-600"
+              :style="{ backgroundColor: option.primary }"
+            />
+            <text class="text-4 text-gray-800 dark:text-gray-200">
+              {{ option.name }}
+            </text>
+          </view>
+          <wd-icon
+            v-if="currentThemeColor.value === option.value"
+            name="check"
+            :color="option.primary"
+            size="20px"
+          />
+        </view>
+      </view>
+      <wd-gap :height="50" />
+    </wd-action-sheet>
+  </view>
+</template>

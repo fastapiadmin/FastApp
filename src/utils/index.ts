@@ -1,17 +1,9 @@
 /**
- * 防抖函数
- * @param fn 函数
- * @param delay 延迟时间
- * @returns
+ * 获取当前页面路径
+ * @returns 当前页面路径
  */
-const debounce = <T extends (...args: any[]) => any>(fn: T, delay: number) => {
-  let timer: ReturnType<typeof setTimeout> | null = null;
-  return function (this: any, ...args: Parameters<T>) {
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(() => {
-      fn.apply(this, args);
-    }, delay);
-  };
-};
-
-export { debounce };
+export function getCurrentPath() {
+  const pages = getCurrentPages()
+  const currentPage = pages[pages.length - 1]
+  return currentPage.route || ''
+}

@@ -3,4 +3,4 @@
  */
 
 // 存储相关常量
-export * from "./storage.constant";
+export * from './storage.constant'

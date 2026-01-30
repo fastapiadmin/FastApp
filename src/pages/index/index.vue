@@ -1,210 +1,440 @@
-<template>
-  <view class="app-container">
-    <wd-swiper v-model:current="current" :list="swiperList" autoplay height="300rpx" />
-
-    <!-- 快捷导航 -->
-    <wd-grid clickable :column="4" class="mt-2">
-      <wd-grid-item
-        v-for="(item, index) in navList"
-        :key="index"
-        use-slot
-        link-type="navigateTo"
-        :url="item.url"
-      >
-        <view class="p-2">
-          <image class="w-72rpx h-72rpx rounded-8rpx" :src="item.icon" />
-        </view>
-        <view class="text theme-text-primary">{{ item.title }}</view>
-      </wd-grid-item>
-    </wd-grid>
-
-    <!-- 通知公告 -->
-    <wd-notice-bar :text="NOTICE_TEXT" color="var(--success-color)" type="info">
-      <template #prefix>
-        <wd-tag
-          color="var(--warning-color)"
-          bg-color="var(--warning-color)"
-          plain
-          custom-style="margin-right:10rpx"
-        >
-          通知公告
-        </wd-tag>
-      </template>
-    </wd-notice-bar>
-
-    <!-- 数据统计 -->
-    <wd-grid :column="2" :gutter="2">
-      <wd-grid-item use-slot custom-class="custom-item">
-        <view class="flex justify-start pl-5">
-          <view class="flex-center">
-            <image class="w-80rpx h-80rpx rounded-8rpx" src="/static/icons/visitor.png" />
-            <view class="ml-5 text-left">
-              <view class="font-bold theme-text-primary">访客数</view>
-              <view class="mt-2 theme-text-primary">{{ visitStatsData.todayUvCount }}</view>
-            </view>
-          </view>
-        </view>
-      </wd-grid-item>
-      <wd-grid-item use-slot custom-class="custom-item">
-        <view class="flex justify-start pl-5">
-          <view class="flex-center">
-            <image class="w-80rpx h-80rpx rounded-8rpx" src="/static/icons/browser.png" />
-            <view class="ml-5 text-left">
-              <view class="font-bold theme-text-primary">浏览量</view>
-              <view class="mt-2 theme-text-primary">{{ visitStatsData.todayPvCount }}</view>
-            </view>
-          </view>
-        </view>
-      </wd-grid-item>
-    </wd-grid>
-
-    <wd-card type="rectangle">
-      <template #title>
-        <view class="flex-between">
-          <view class="theme-text-primary">访问趋势</view>
-          <view>
-            <wd-radio-group
-              :value="recentDaysRange"
-              shape="button"
-              inline
-              @change="handleDataRangeChange"
-            >
-              <wd-radio v-for="days in DAYS_RANGE_OPTIONS" :key="days" :value="days">
-                近{{ days }}天
-              </wd-radio>
-            </wd-radio-group>
-          </view>
-        </view>
-      </template>
-
-      <view class="h-240px mb-2rpx">
-        <qiun-data-charts type="area" :chartData="chartData" :opts="chartOpts" />
-      </view>
-    </wd-card>
-  </view>
-</template>
-
 <script setup lang="ts">
-import { dayjs } from "wot-design-uni";
-import type { VisitStatsVO } from "./types";
-import {
-  SWIPER_LIST,
-  NAV_LIST,
-  DEFAULT_VISIT_STATS,
-  NOTICE_TEXT,
-  DEFAULT_DAYS_RANGE,
-  DAYS_RANGE_OPTIONS,
-  CHART_OPTS,
-  CHART_SERIES_NAMES,
-} from "./data";
+import { onReady, onShow } from '@dcloudio/uni-app'
+import { reactive, ref } from 'vue'
 
-const current = ref<number>(0);
+definePage({
+  name: 'home',
+  layout: 'tabbar',
+  style: {
+    navigationBarTitleText: '首页',
+  },
+})
 
-const visitStatsData = ref<VisitStatsVO>(DEFAULT_VISIT_STATS);
+const current = ref<number>(0)
+
+/**
+ * 访问统计数据
+ */
+interface VisitStatsVO {
+  todayUvCount: number
+  uvGrowthRate: number
+  totalUvCount: number
+  todayPvCount: number
+  pvGrowthRate: number
+  totalPvCount: number
+}
+
+/**
+ * 导航项
+ */
+interface NavItem {
+  icon: string
+  title: string
+  url: string
+  prem: string
+}
+
+/**
+ * 快捷导航列表
+ */
+const NAV_LIST: NavItem[] = [
+  {
+    icon: '/static/icons/user.png',
+    title: '用户管理',
+    url: '/pages/work/user/index',
+    prem: 'sys:user:query',
+  },
+  {
+    icon: '/static/icons/role.png',
+    title: '角色管理',
+    url: '/pages/work/role/index',
+    prem: 'sys:role:query',
+  },
+  {
+    icon: '/static/icons/notice.png',
+    title: '通知公告',
+    url: '/pages/work/notice/index',
+    prem: 'sys:notice:query',
+  },
+  {
+    icon: '/static/icons/setting.png',
+    title: '系统配置',
+    url: '/pages/work/config/index',
+    prem: 'sys:config:query',
+  },
+]
+
+/**
+ * 默认访问统计数据
+ */
+const DEFAULT_VISIT_STATS: VisitStatsVO = {
+  todayUvCount: 1234,
+  uvGrowthRate: 15.6,
+  totalUvCount: 45678,
+  todayPvCount: 5678,
+  pvGrowthRate: 23.4,
+  totalPvCount: 123456,
+}
+
+// 通知公告文本
+const NOTICE_TEXT = '通知公告: fastapp 是一个基于 Vue3 + UniApp 的前端模板项目，提供了一套完整的前端解决方案'
+
+// 默认日期范围（天数)
+const DEFAULT_DAYS_RANGE = 7
+
+// 日期范围选项
+const DAYS_RANGE_OPTIONS = [7, 15] as const
+
+// 访问统计数据
+const visitStatsData = ref<VisitStatsVO>(DEFAULT_VISIT_STATS)
 
 // 图表数据
-const chartData = ref({});
-
-// 图表配置
-const chartOpts = ref(CHART_OPTS);
+const chartData = ref({})
 
 // 日期范围
-const recentDaysRange = ref(DEFAULT_DAYS_RANGE);
+const recentDaysRange = ref(DEFAULT_DAYS_RANGE)
 
 // 轮播图列表
-const swiperList = ref(SWIPER_LIST);
+const swiperList = ref([
+  '/static/images/banner01.jpg',
+  '/static/images/banner02.jpg',
+])
 
 // 快捷导航列表
-const navList = reactive(NAV_LIST);
+const navList = reactive(NAV_LIST)
+
+// 导航到指定页面
+function navigateTo(url: string) {
+  // 避免空 URL 导航
+  if (!url)
+    return
+
+  // 根据 URL 类型选择不同的导航方式
+  if (
+    url.startsWith('/pages/')
+    && (url.includes('/index/')
+      || url.includes('/mine/')
+      || url.includes('/work/'))
+  ) {
+    uni.switchTab({
+      url,
+    })
+  }
+  else {
+    uni.navigateTo({
+      url,
+    })
+  }
+}
 
 // 生成静态的访问趋势数据
-const generateStaticTrendData = (days: number) => {
-  const dates = [];
-  const ipList = [];
-  const pvList = [];
+function generateStaticTrendData(days: number) {
+  const ipList = []
+  const pvList = []
 
-  const today = new Date();
+  const today = new Date()
 
   for (let i = days - 1; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
-    dates.push(dayjs(date).format("MM-DD"));
+    const date = new Date(today)
+    date.setDate(today.getDate() - i)
 
     // 生成模拟数据
-    ipList.push(Math.floor(Math.random() * 500) + 200);
-    pvList.push(Math.floor(Math.random() * 1000) + 500);
+    ipList.push(Math.floor(Math.random() * 500) + 200)
+    pvList.push(Math.floor(Math.random() * 1000) + 500)
   }
 
   return {
-    dates,
     ipList,
     pvList,
-  };
-};
+  }
+}
 
 // 加载访问统计数据（使用静态数据）
-const loadVisitStatsData = async () => {
+async function loadVisitStatsData() {
   // 模拟异步加载
   setTimeout(() => {
-    visitStatsData.value = { ...DEFAULT_VISIT_STATS };
-  }, 100);
-};
+    visitStatsData.value = { ...DEFAULT_VISIT_STATS }
+  }, 100)
+}
 
 // 加载访问趋势数据（使用静态数据）
-const loadVisitTrendData = () => {
+function loadVisitTrendData() {
   // 模拟异步加载
   setTimeout(() => {
-    const data = generateStaticTrendData(recentDaysRange.value);
+    const data = generateStaticTrendData(recentDaysRange.value)
 
     const res = {
-      categories: data.dates,
       series: [
         {
-          name: CHART_SERIES_NAMES.UV,
+          name: 'UV',
           data: data.ipList,
         },
         {
-          name: CHART_SERIES_NAMES.PV,
+          name: 'PV',
           data: data.pvList,
         },
       ],
-    };
-    chartData.value = JSON.parse(JSON.stringify(res));
-  }, 100);
-};
+    }
+    chartData.value = JSON.parse(JSON.stringify(res))
+  }, 100)
+}
 
-//  数据范围变化
-const handleDataRangeChange = ({ value }: { value: number }) => {
-  recentDaysRange.value = value;
-  loadVisitTrendData();
-};
+// 数据范围变化
+function handleDataRangeChange(value: number) {
+  recentDaysRange.value = value
+  loadVisitTrendData()
+}
 
 onReady(() => {
-  loadVisitStatsData();
-  loadVisitTrendData();
-});
+  loadVisitStatsData()
+  loadVisitTrendData()
+})
 
 onShow(() => {
   // 确保 tabbar 状态正确
-  const pages = getCurrentPages();
+  const pages = getCurrentPages()
   if (pages.length > 0) {
-    const currentPage = pages[pages.length - 1];
-    if (currentPage.route === "pages/index/index") {
+    const currentPage = pages[pages.length - 1]
+    if (currentPage.route === 'pages/index/index') {
       // 通过事件通知 tabbar 布局更新状态
-      uni.$emit("updateTabbar", "index");
+      uni.$emit('updateTabbar', 'index')
     }
   }
-});
+})
 </script>
 
-<route lang="json">
-{
-  "name": "index",
-  "style": {
-    "navigationStyle": "custom"
-  },
-  "layout": "tabbar"
-}
-</route>
+<template>
+  <view class="app-container">
+    <!-- 轮播图 -->
+    <view class="swiper-container">
+      <wd-swiper
+        v-model:current="current"
+        :list="swiperList"
+        autoplay
+        indicator
+        image-mode="scaleToFill"
+      />
+    </view>
 
-<style lang="scss" scoped></style>
+    <!-- 快捷导航 -->
+    <view class="nav-grid">
+      <wd-grid clickable :column="4">
+        <wd-grid-item
+          v-for="(item, index) in navList"
+          :key="index"
+          @click="navigateTo(item.url)"
+        >
+          <template #icon>
+            <image class="icon-image" :src="item.icon" lazy-load />
+          </template>
+          <template #text>
+            <view class="nav-title theme-text-primary">
+              {{ item.title }}
+            </view>
+          </template>
+        </wd-grid-item>
+      </wd-grid>
+    </view>
+
+    <!-- 通知公告 -->
+    <view class="notice-text">
+      <wd-notice-bar
+        type="warning"
+        prefix="warn-bold"
+        :text="NOTICE_TEXT"
+      />
+    </view>
+
+    <!-- 数据统计 -->
+    <view class="stats-grid">
+      <view class="stats-item">
+        <image class="stats-icon" src="/static/icons/visitor.png" lazy-load />
+        <view class="stats-info">
+          <view class="stats-label">
+            访客数
+          </view>
+          <view class="stats-value theme-text-primary">
+            {{
+              visitStatsData.todayUvCount
+            }}
+          </view>
+        </view>
+      </view>
+      <view class="stats-item">
+        <image class="stats-icon" src="/static/icons/browser.png" lazy-load />
+        <view class="stats-info">
+          <view class="stats-label">
+            浏览量
+          </view>
+          <view class="stats-value theme-text-primary">
+            {{
+              visitStatsData.todayPvCount
+            }}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 访问趋势 -->
+    <view class="trend-card">
+      <view class="trend-header">
+        <view class="trend-title">
+          访问趋势
+        </view>
+        <view class="trend-buttons">
+          <button
+            v-for="days in DAYS_RANGE_OPTIONS"
+            :key="days"
+            class="range-button"
+            :class="{ active: recentDaysRange === days }"
+            @click="handleDataRangeChange(days)"
+          >
+            近{{ days }}天
+          </button>
+        </view>
+      </view>
+      <view class="trend-content">
+        <view class="chart-container">
+          <!-- 简化处理，移除图表组件 -->
+          <view class="chart-placeholder">
+            访问趋势图表
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<style lang="scss" scoped>
+.app-container {
+  padding: 20rpx;
+}
+
+.swiper-container {
+  margin-bottom: 20rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.nav-grid {
+  margin-bottom: 20rpx;
+  border-radius: 16rpx;
+
+  .icon-image {
+    width: 64rpx;
+    height: 64rpx;
+    border-radius: 8rpx;
+  }
+
+  .nav-title {
+    margin-bottom: 20rpx;
+    border-radius: 16rpx;
+    font-size: 24rpx;
+    text-align: center;
+    margin-top: 12rpx;
+  }
+}
+
+.notice-text {
+  margin-bottom: 20rpx;
+  border-radius: 16rpx;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10rpx;
+  margin-bottom: 20rpx;
+}
+
+.stats-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  background-color: var(--bg-color-2);
+  border-radius: 16rpx;
+}
+
+.stats-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 8rpx;
+  margin-right: 20rpx;
+}
+
+.stats-info {
+  flex: 1;
+}
+
+.stats-label {
+  font-size: 24rpx;
+  color: var(--text-color-2);
+  margin-bottom: 10rpx;
+}
+
+.stats-value {
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.trend-card {
+  background-color: var(--bg-color-2);
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.trend-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.trend-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.trend-buttons {
+  display: flex;
+  gap: 10rpx;
+}
+
+.range-button {
+  padding: 8rpx 16rpx;
+  font-size: 20rpx;
+  border: 1rpx solid var(--border-color);
+  border-radius: 20rpx;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.range-button.active {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.trend-content {
+  height: 240px;
+}
+
+.chart-container {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-color);
+  border-radius: 8rpx;
+  color: var(--text-color-2);
+  font-size: 24rpx;
+}
+</style>

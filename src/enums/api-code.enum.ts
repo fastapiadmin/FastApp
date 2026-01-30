@@ -1,7 +1,7 @@
 /**
  * API响应码枚举
  */
-export const enum ApiCode {
+export enum ApiCode {
   /**
    * 成功
    */

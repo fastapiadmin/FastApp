@@ -1,85 +1,79 @@
-import { pages, subPackages } from "virtual:uni-pages";
-import { isLoggedIn } from "@/utils/auth";
-import { createRouter } from "uni-mini-router";
+/// <reference types="@uni-helper/vite-plugin-uni-pages/client" />
+import { pages, subPackages } from 'virtual:uni-pages'
 
-// 生成路由配置
 function generateRoutes() {
-  const routes = pages.map((page: { path: string; [key: string]: any }) => {
-    const newPath = `/${page.path}`;
-    // 透传 meta 字段（如果 pages.json 中定义了）
-    const meta = page.meta ?? undefined;
-    return { ...page, path: newPath, meta };
-  });
-
-  // 处理分包路由
+  const routes = pages.map((page) => {
+    const newPath = `/${page.path}`
+    return { ...page, path: newPath }
+  })
   if (subPackages && subPackages.length > 0) {
-    subPackages.forEach((subPackage: { root: string; pages: any[] }) => {
+    subPackages.forEach((subPackage) => {
       const subRoutes = subPackage.pages.map((page: any) => {
-        const newPath = `/${subPackage.root}/${page.path}`;
-        const meta = page.meta ?? undefined;
-        return { ...page, path: newPath, meta };
-      });
-      routes.push(...subRoutes);
-    });
+        const newPath = `/${subPackage.root}/${page.path}`
+        return { ...page, path: newPath }
+      })
+      routes.push(...subRoutes)
+    })
   }
-  return routes;
+  return routes
 }
 
-// 创建路由实例
 const router = createRouter({
   routes: generateRoutes(),
-});
-
-// 全局前置守卫
+})
 router.beforeEach((to, from, next) => {
-  console.log("🚀 路由守卫触发:", {
-    to: to.path,
-    from: from.path,
-    requireAuth: to.meta?.requireAuth,
-  });
+  console.log('🚀 beforeEach 守卫触发:', { to, from })
 
-  if (to.meta && to.meta.requireAuth && !isLoggedIn()) {
-    console.log("🔒 需要登录，但用户未登录");
-
-    // 先阻止当前导航
-    next(false);
-
-    // 然后显示登录提示
-    uni.showModal({
-      title: "提示",
-      content: "该功能需要登录后使用",
-      confirmText: "去登录",
-      cancelText: "返回",
-      success: (res) => {
-        if (res.confirm) {
-          // 记住原来要去的页面
-          uni.setStorageSync("redirect", to.fullPath);
-          // 使用 uni 原生导航而不是 router
-          uni.navigateTo({
-            url: "/pages/login/index",
-          });
-        } else {
-          // 取消则返回首页
-          uni.switchTab({
-            url: "/pages/index/index",
-          });
-        }
-      },
-      fail: () => {
-        // 失败时也返回首页
-        uni.switchTab({
-          url: "/pages/index/index",
-        });
-      },
-    });
-  } else {
-    // 继续导航
-    next();
+  // 演示：基本的导航日志记录
+  if (to.path && from.path) {
+    console.log(`📍 导航: ${from.path} → ${to.path}`)
   }
-});
+
+  // 演示：对受保护页面的简单拦截
+  if (to.name === 'demo-protected') {
+    const { confirm: showConfirm } = useGlobalMessage()
+    console.log('🛡️ 检测到访问受保护页面')
+
+    return new Promise<void>((resolve, reject) => {
+      showConfirm({
+        title: '守卫拦截演示',
+        msg: '这是一个受保护的页面，需要确认后才能访问',
+        confirmButtonText: '允许访问',
+        cancelButtonText: '取消',
+        success() {
+          console.log('✅ 用户确认访问，允许导航')
+          next()
+          resolve()
+        },
+        fail() {
+          console.log('❌ 用户取消访问，阻止导航')
+          next(false)
+          reject(new Error('用户取消访问'))
+        },
+      })
+    })
+  }
+
+  // 继续导航
+  next()
+})
 
 router.afterEach((to, from) => {
-  console.log("🎯 afterEach 钩子触发:", { to, from });
-});
+  console.log('🎯 afterEach 钩子触发:', { to, from })
 
-export default router;
+  // 演示：简单的页面切换记录
+  if (to.path) {
+    console.log(`📄 页面切换完成: ${to.path}`)
+  }
+
+  // 演示：针对 afterEach 演示页面的简单提示
+  if (to.name === 'demo-aftereach') {
+    const { show: showToast } = useGlobalToast()
+    console.log('📊 进入 afterEach 演示页面')
+    setTimeout(() => {
+      showToast('afterEach 钩子已触发！')
+    }, 500)
+  }
+})
+
+export default router

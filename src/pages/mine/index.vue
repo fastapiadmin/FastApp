@@ -1,8 +1,177 @@
+<!-- layout: tabbar -->
+<script lang="ts" setup>
+import { onShow } from '@dcloudio/uni-app'
+import { computed, ref, watch } from 'vue'
+import { useToast } from 'wot-design-uni'
+import { useUserStore } from '@/store/userStore'
+
+definePage({
+  name: 'mine',
+  layout: 'tabbar',
+  style: {
+    navigationBarTitleText: '我的',
+  },
+})
+
+// 页面配置
+// 移除了 definePage 调用，使用默认配置
+
+const toast = useToast()
+const userStore = useUserStore()
+
+// 强制重新渲染的key
+const renderKey = ref(0)
+
+// 主题是否已准备好
+const isThemeReady = ref(true) // 立即设置为 true，因为 themeVars computed 已经有默认值保护
+
+const userInfo = computed(() => userStore.userInfo)
+const isLogin = computed(() => !!userInfo.value)
+const defaultAvatar = '/static/images/default-avatar.png'
+const isLoading = ref(false)
+
+// 登录
+function navigateToLoginPage() {
+  const pages = getCurrentPages()
+  const currentPage = pages[pages.length - 1]
+  const currentPagePath = `/${currentPage.route}`
+
+  uni.navigateTo({
+    url: `/pages/login/index?redirect=${encodeURIComponent(currentPagePath)}`,
+  })
+}
+
+// 退出登录
+function handleLogout() {
+  uni.showModal({
+    title: '提示',
+    content: '确认退出登录吗？',
+    success(res) {
+      if (res.confirm) {
+        userStore.logout()
+        toast.show('已退出登录')
+      }
+    },
+  })
+}
+
+// 个人信息
+function navigateToProfile() {
+  if (!isLogin.value) {
+    navigateToLoginPage()
+    return
+  }
+  uni.navigateTo({
+    url: '/pages/mine/profile/index',
+  })
+}
+
+// 常见问题
+function navigateToFAQ() {
+  uni.navigateTo({
+    url: '/pages/mine/faq/index',
+  })
+}
+
+// 关于我们
+function navigateToAbout() {
+  uni.navigateTo({
+    url: '/pages/mine/about/index',
+  })
+}
+
+// 设置按钮点击处理
+function handleSettingsClick(e?: any) {
+  if (e) {
+    e.stopPropagation()
+    e.preventDefault()
+  }
+  navigateToSettings()
+}
+
+// 设置
+function navigateToSettings() {
+  uni.navigateTo({
+    url: '/pages/mine/settings/index',
+  })
+}
+
+// 消息按钮点击处理
+function handleMessagesClick(e?: any) {
+  if (e) {
+    e.stopPropagation()
+    e.preventDefault()
+  }
+  navigateToSection('messages')
+}
+
+// 问题反馈
+function handleQuestionFeedback() {
+  uni.navigateTo({
+    url: '/pages/mine/feedback/index',
+  })
+}
+
+// 导航到各个板块
+function navigateToSection(section: string, subSection?: string, e?: any) {
+  if (e) {
+    e.stopPropagation()
+    e.preventDefault()
+  }
+  // 这里可以根据需要实现具体的导航逻辑
+  uni.showToast({
+    title: '功能开发中',
+    icon: 'none',
+  })
+}
+
+onShow(() => {
+  // 确保 tabbar 状态正确
+  const pages = getCurrentPages()
+  if (pages.length > 0) {
+    const currentPage = pages[pages.length - 1]
+    if (currentPage.route === 'pages/mine/index') {
+      // 通过事件通知 tabbar 布局更新状态
+      uni.$emit('updateTabbar', 'mine')
+    }
+  }
+
+  // 每次显示页面时都检查并刷新用户信息
+  loadUserInfo()
+})
+
+// 加载用户信息
+async function loadUserInfo() {
+  if (isLogin.value) {
+    isLoading.value = true
+    try {
+      await userStore.getInfo()
+    }
+    catch (error) {
+      console.error('获取用户信息失败', error)
+    }
+    finally {
+      isLoading.value = false
+    }
+  }
+}
+
+// 监听用户信息变化，确保数据及时更新
+watch(
+  () => userInfo.value,
+  () => {},
+  {
+    deep: true,
+    immediate: true,
+  },
+)
+</script>
+
 <template>
   <view v-if="isThemeReady" :key="renderKey" class="app-container">
     <!-- 用户信息卡片 -->
     <view class="user-profile theme-card">
-      <view class="blur-bg"></view>
+      <view class="blur-bg" />
       <view class="user-info">
         <view class="avatar-container" @click="navigateToProfile">
           <image
@@ -13,13 +182,19 @@
         </view>
         <view class="user-details">
           <block v-if="isLogin">
-            <view class="nickname theme-text-primary">{{ userInfo?.name || "匿名用户" }}</view>
+            <view class="nickname theme-text-primary">
+              {{
+                userInfo?.name || "匿名用户"
+              }}
+            </view>
             <view class="user-id theme-text-secondary">
               ID: {{ userInfo?.username || "0000000" }}
             </view>
           </block>
           <block v-else>
-            <view class="login-prompt text-white">立即登录获取更多功能</view>
+            <view class="login-prompt text-white">
+              立即登录获取更多功能
+            </view>
             <wd-button
               custom-class="btn-login"
               size="small"
@@ -36,7 +211,9 @@
             @click="handleSettingsClick"
             @tap="handleSettingsClick"
           >
-            <text class="debug-text">⚙️</text>
+            <text class="debug-text">
+              ⚙️
+            </text>
             <wd-icon name="setting1" size="22" color="#a0a0a0" />
           </view>
           <view
@@ -45,7 +222,7 @@
             @click="handleMessagesClick"
             @tap="handleMessagesClick"
           >
-            <wd-badge v-if="true" modelValue="99+">
+            <wd-badge v-if="true" model-value="99+">
               <wd-icon name="notification" size="22" color="#a0a0a0" />
             </wd-badge>
           </view>
@@ -56,105 +233,117 @@
     <!-- 数据统计 -->
     <view class="stats-card theme-card">
       <view class="stats-item" @click="navigateToSection('wallet')">
-        <view class="mb-sm text-lg font-bold theme-text-primary">0.00</view>
-        <view class="text-sm theme-text-secondary">我的余额</view>
+        <view class="theme-text-primary mb-sm text-lg font-bold">
+          0.00
+        </view>
+        <view class="theme-text-secondary text-sm">
+          我的余额
+        </view>
       </view>
-      <view class="stats-divider"></view>
+      <view class="stats-divider" />
       <view class="stats-item" @click="navigateToSection('favorites')">
-        <view class="mb-sm text-lg font-bold theme-text-primary">0</view>
-        <view class="text-sm theme-text-secondary">我的收藏</view>
+        <view class="theme-text-primary mb-sm text-lg font-bold">
+          0
+        </view>
+        <view class="theme-text-secondary text-sm">
+          我的收藏
+        </view>
       </view>
-      <view class="stats-divider"></view>
+      <view class="stats-divider" />
       <view class="stats-item" @click="navigateToSection('history')">
-        <view class="mb-sm text-lg font-bold theme-text-primary">0</view>
-        <view class="text-sm theme-text-secondary">浏览历史</view>
+        <view class="theme-text-primary mb-sm text-lg font-bold">
+          0
+        </view>
+        <view class="theme-text-secondary text-sm">
+          浏览历史
+        </view>
       </view>
     </view>
 
     <!-- 常用工具 -->
-    <view class="card-container">
+    <view class="card-container theme-card">
       <view class="card-header">
         <view class="flex-start">
-          <wd-icon name="tools" size="18" :color="themeVars.colorTheme" />
-          <text class="theme-text-secondary ml-12rpx text-28rpx font-600">常用工具</text>
+          <wd-icon name="tools" size="18" />
+          <text class="theme-text-secondary ml-12rpx text-28rpx font-600">
+            常用工具
+          </text>
         </view>
       </view>
-      <view class="flex flex-wrap p-20rpx pt-20rpx pb-10rpx">
+      <view class="flex flex-wrap p-20rpx pb-10rpx pt-20rpx">
         <view class="tool-item" @click="navigateToProfile">
           <view class="tool-icon">
-            <wd-icon name="user" size="24" :color="currentThemeColor.primary" />
+            <wd-icon name="user" size="24" />
           </view>
-          <view class="theme-text-secondary text-24rpx">个人资料</view>
+          <view class="theme-text-secondary text-24rpx">
+            个人资料
+          </view>
         </view>
         <view class="tool-item" @click="navigateToFAQ">
           <view class="tool-icon">
-            <wd-icon name="help-circle" size="24" :color="currentThemeColor.primary" />
+            <wd-icon
+              name="help-circle"
+              size="24"
+            />
           </view>
-          <view class="theme-text-secondary text-24rpx">常见问题</view>
+          <view class="theme-text-secondary text-24rpx">
+            常见问题
+          </view>
         </view>
         <view class="tool-item" @click="handleQuestionFeedback">
           <view class="tool-icon">
-            <wd-icon name="check-circle" size="24" :color="currentThemeColor.primary" />
+            <wd-icon
+              name="check-circle"
+              size="24"
+            />
           </view>
-          <view class="theme-text-secondary text-24rpx">问题反馈</view>
+          <view class="theme-text-secondary text-24rpx">
+            问题反馈
+          </view>
         </view>
         <view class="tool-item" @click="navigateToAbout">
           <view class="tool-icon">
-            <wd-icon name="info-circle" size="24" :color="currentThemeColor.primary" />
+            <wd-icon
+              name="info-circle"
+              size="24"
+            />
           </view>
-          <view class="theme-text-secondary text-24rpx">关于我们</view>
+          <view class="theme-text-secondary text-24rpx">
+            关于我们
+          </view>
         </view>
       </view>
     </view>
 
     <!-- 推荐服务 -->
-    <view class="card-container">
+    <view class="card-container theme-card">
       <view class="card-header">
         <view class="flex-start">
-          <wd-icon name="star" size="18" :color="currentThemeColor.primary" />
-          <text class="theme-text-secondary ml-12rpx text-28rpx font-600">推荐服务</text>
+          <wd-icon name="star" size="18" />
+          <text class="theme-text-secondary ml-12rpx text-28rpx font-600">
+            推荐服务
+          </text>
         </view>
       </view>
       <view>
-        <view class="service-item" @click="navigateToSection('services', 'vip')">
-          <view class="flex-start">
-            <view class="service-icon">
-              <wd-icon name="dong" size="22" :color="currentThemeColor.primary" />
-            </view>
-            <view>
-              <view class="theme-text-secondary text-28rpx font-500">会员中心</view>
-              <view class="mt-8rpx text-24rpx text-gray-500">解锁更多特权</view>
-            </view>
-          </view>
-          <wd-icon name="arrow-right" size="14" />
-        </view>
-        <view class="service-item" @click="navigateToSection('services', 'coupon')">
-          <view class="flex-start">
-            <view class="service-icon">
-              <wd-icon name="discount" size="22" :color="currentThemeColor.primary" />
-            </view>
-            <view>
-              <view class="theme-text-secondary text-28rpx font-500 text-28rpx font-500">
-                优惠券
-              </view>
-              <view class="mt-8rpx text-24rpx text-gray-500">查看我的优惠券</view>
-            </view>
-          </view>
-          <wd-icon name="arrow-right" size="14" />
-        </view>
         <view
-          class="service-item service-item-last"
-          @click="navigateToSection('services', 'invite')"
+          class="service-item"
+          @click="navigateToSection('services', 'vip')"
         >
           <view class="flex-start">
             <view class="service-icon">
-              <wd-icon name="share" size="22" :color="currentThemeColor.primary" />
+              <wd-icon
+                name="dong"
+                size="22"
+              />
             </view>
             <view>
-              <view class="theme-text-secondary text-28rpx font-500 text-28rpx font-500">
-                邀请有礼
+              <view class="theme-text-secondary text-28rpx font-500">
+                会员中心
               </view>
-              <view class="mt-8rpx text-24rpx text-gray-500">邀请好友得奖励</view>
+              <view class="mt-8rpx text-24rpx text-gray-500">
+                解锁更多特权
+              </view>
             </view>
           </view>
           <wd-icon name="arrow-right" size="14" />
@@ -164,249 +353,13 @@
 
     <!-- 退出登录按钮 -->
     <view v-if="isLogin" class="p-30rpx">
-      <wd-button custom-class="logout-button" plain @click="handleLogout">退出登录</wd-button>
+      <wd-button size="large" block @click="handleLogout">
+        退出登录
+      </wd-button>
     </view>
     <wd-toast />
   </view>
 </template>
-
-<script lang="ts" setup>
-import { useToast } from "wot-design-uni";
-import { useRouter } from "uni-mini-router";
-import { useUserStore } from "@/store";
-import { useThemeStore } from "@/store/modules/theme.store";
-import { computed, ref, onMounted, onUnmounted, watch } from "vue";
-
-const toast = useToast();
-const userStore = useUserStore();
-const themeStore = useThemeStore();
-
-// 强制重新渲染的key
-const renderKey = ref(0);
-
-// 主题是否已准备好
-const isThemeReady = ref(true); // 立即设置为 true，因为 themeVars computed 已经有默认值保护
-
-// 默认主题变量对象
-const defaultThemeVars = {
-  darkColor3: "#a0a0a0",
-  darkColor: "#ffffff",
-  darkColor2: "#e0e0e0",
-  colorTheme: "#4D7FFF",
-  colorBg: "#f8f8f8",
-  colorTitle: "#1d2129",
-  colorContent: "#4e5969",
-  colorSecondary: "#86909c",
-  colorBorder: "#e5e6eb",
-  colorBorderLight: "#f2f3f5",
-  cardBg: "#ffffff",
-  cardTitleColor: "#1d2129",
-  cardContentColor: "#4e5969",
-  cardContentBorderColor: "#e5e6eb",
-};
-
-// 主题变量，确保始终有默认值
-const themeVars = computed(() => {
-  try {
-    const vars = themeStore?.themeVars;
-    // 如果 themeVars 不存在，返回默认值对象
-    if (!vars) {
-      return defaultThemeVars;
-    }
-    // 确保所有必需的属性都有值
-    return {
-      ...defaultThemeVars,
-      ...vars,
-      darkColor3: vars.darkColor3 || defaultThemeVars.darkColor3,
-      colorTheme: vars.colorTheme || defaultThemeVars.colorTheme,
-    };
-  } catch {
-    // 静默失败，使用默认值
-    return defaultThemeVars;
-  }
-});
-
-// 修复: 直接返回主题色对象，确保可以访问primary属性
-const currentThemeColor = computed(() => {
-  try {
-    const color = themeStore?.currentThemeColor;
-    return color || { primary: "#4D7FFF", name: "默认蓝", value: "blue" };
-  } catch {
-    // 静默失败，使用默认值
-    return { primary: "#4D7FFF", name: "默认蓝", value: "blue" };
-  }
-});
-
-// 确保 themeStore 已初始化
-onMounted(() => {
-  try {
-    // 强制初始化主题
-    if (!themeStore.themeVars) {
-      themeStore.initTheme();
-    } else if (!themeStore.themeVars.darkColor3) {
-      themeStore.initTheme();
-    }
-  } catch {
-    // 即使初始化失败，themeVars computed 也会返回默认值
-  }
-});
-
-const userInfo = computed(() => userStore.userInfo);
-const isLogin = computed(() => !!userInfo.value);
-const defaultAvatar = "/static/images/default-avatar.png";
-const isLoading = ref(false);
-
-const router = useRouter();
-
-// 监听主题色变化 - 使用下划线前缀标记未使用的参数
-const handleThemeColorChange = (_color: string) => {
-  renderKey.value++;
-};
-
-onMounted(() => {
-  uni.$on("global-theme-color-change", handleThemeColorChange);
-});
-
-onUnmounted(() => {
-  uni.$off("global-theme-color-change", handleThemeColorChange);
-});
-
-// 登录
-const navigateToLoginPage = () => {
-  const pages = getCurrentPages();
-  const currentPage = pages[pages.length - 1];
-  const currentPagePath = `/${currentPage.route}`;
-
-  router.push({
-    path: "/pages/login/index",
-    query: { redirect: currentPagePath },
-  });
-};
-
-// 退出登录
-const handleLogout = () => {
-  uni.showModal({
-    title: "提示",
-    content: "确认退出登录吗？",
-    success: function (res) {
-      if (res.confirm) {
-        userStore.logout();
-        toast.show("已退出登录");
-      }
-    },
-  });
-};
-
-// 个人信息
-const navigateToProfile = () => {
-  if (!isLogin.value) {
-    navigateToLoginPage();
-    return;
-  }
-  router.push({ path: "/pages/mine/profile/index" });
-};
-
-// 常见问题
-const navigateToFAQ = () => {
-  router.push({ path: "/pages/mine/faq/index" });
-};
-
-// 关于我们
-const navigateToAbout = () => {
-  router.push({ path: "/pages/mine/about/index" });
-};
-
-// 设置按钮点击处理
-const handleSettingsClick = (e?: any) => {
-  if (e) {
-    e.stopPropagation();
-    e.preventDefault();
-  }
-  navigateToSettings();
-};
-
-// 设置
-const navigateToSettings = () => {
-  // 使用 router.push，与其他页面保持一致
-  router.push({ path: "/pages/mine/settings/index" });
-};
-
-// 消息按钮点击处理
-const handleMessagesClick = (e?: any) => {
-  if (e) {
-    e.stopPropagation();
-    e.preventDefault();
-  }
-  navigateToSection("messages");
-};
-
-// 问题反馈
-const handleQuestionFeedback = () => {
-  router.push({ path: "/pages/mine/feedback/index" });
-};
-
-// 导航到各个板块
-const navigateToSection = (section: string, subSection?: string, e?: any) => {
-  if (e) {
-    e.stopPropagation();
-    e.preventDefault();
-  }
-  // 这里可以根据需要实现具体的导航逻辑
-  uni.showToast({
-    title: "功能开发中",
-    icon: "none",
-  });
-};
-
-onShow(() => {
-  // 确保 tabbar 状态正确
-  const pages = getCurrentPages();
-  if (pages.length > 0) {
-    const currentPage = pages[pages.length - 1];
-    if (currentPage.route === "pages/mine/index") {
-      // 通过事件通知 tabbar 布局更新状态
-      uni.$emit("updateTabbar", "mine");
-    }
-  }
-
-  // 每次显示页面时都检查并刷新用户信息
-  loadUserInfo();
-});
-
-// 加载用户信息
-const loadUserInfo = async () => {
-  if (isLogin.value) {
-    isLoading.value = true;
-    try {
-      await userStore.getInfo();
-    } catch (error) {
-      console.error("获取用户信息失败", error);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-};
-
-// 监听用户信息变化，确保数据及时更新
-watch(
-  () => userInfo.value,
-  () => {},
-  {
-    deep: true,
-    immediate: true,
-  }
-);
-</script>
-
-<route lang="json">
-{
-  "name": "mine",
-  "style": {
-    "navigationStyle": "custom"
-  },
-  "layout": "tabbar"
-}
-</route>
 
 <style lang="scss" scoped>
 // 用户信息卡片
@@ -425,7 +378,11 @@ watch(
     left: 0;
     z-index: 0;
     height: 240rpx;
-    background: linear-gradient(135deg, var(--wot-color-theme, #165dff) 0%, #667eea 100%);
+    background: linear-gradient(
+      135deg,
+      var(--wot-color-theme, #165dff) 0%,
+      #667eea 100%
+    );
   }
 
   .user-info {
@@ -500,7 +457,6 @@ watch(
           position: relative;
           z-index: 102;
           display: block !important;
-          color: #a0a0a0 !important;
           visibility: visible !important;
           opacity: 1 !important;
         }
@@ -513,7 +469,6 @@ watch(
         // 设置按钮特殊样式
         &.action-btn-settings {
           z-index: 102;
-          border: 2rpx solid rgba(160, 160, 160, 0.3);
         }
       }
     }
@@ -522,10 +477,11 @@ watch(
 
 // 卡片容器
 .card-container {
-  margin: 24rpx 12rpx;
-  overflow: hidden;
-  background-color: var(--card-bg-color, #ffffff);
+  align-items: center;
+  padding: 12rpx;
   border-radius: 16rpx;
+  margin: 24rpx 12rpx;
+  background-color: var(--card-bg-color);
   box-shadow: var(--shadow-medium);
 }
 
@@ -534,8 +490,8 @@ watch(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20rpx 24rpx;
-  border-bottom: 1rpx solid var(--border-color, #e5e7eb);
+  padding: 12rpx 24rpx;
+  border-bottom: 1rpx solid var(--border-color);
 }
 
 // 工具项
@@ -555,13 +511,8 @@ watch(
   width: 90rpx;
   height: 90rpx;
   margin-bottom: 12rpx;
-  background-color: var(--bg-color-2, #f3f4f6);
+  background-color: var(--bg-color-2);
   border-radius: 18rpx;
-  transition: transform 0.15s ease;
-
-  &:active {
-    transform: scale(0.95);
-  }
 }
 
 // 数据统计卡片
@@ -570,7 +521,7 @@ watch(
   align-items: center;
   padding: 30rpx;
   margin: 24rpx 12rpx;
-  background-color: var(--card-bg-color, #ffffff);
+  background-color: var(--card-bg-color);
   border-radius: 16rpx;
   box-shadow: var(--shadow-medium);
 }
@@ -585,7 +536,7 @@ watch(
 .stats-divider {
   width: 1px;
   margin: 0 20rpx;
-  background-color: var(--border-color, #e5e7eb);
+  background-color: var(--border-color);
 }
 
 // 服务项
@@ -594,11 +545,11 @@ watch(
   align-items: center;
   justify-content: space-between;
   padding: 24rpx;
-  border-bottom: 1rpx solid var(--border-color, #e5e7eb);
+  border-bottom: 1rpx solid var(--border-color);
   transition: background-color 0.15s ease;
 
   &:active {
-    background-color: var(--bg-color-2, #f3f4f6);
+    background-color: var(--bg-color-2);
   }
 
   &.service-item-last {
@@ -614,7 +565,7 @@ watch(
   width: 80rpx;
   height: 80rpx;
   margin-right: 20rpx;
-  background-color: var(--bg-color-2, #f3f4f6);
+  background-color: var(--bg-color-2);
   border-radius: 16rpx;
 }
 
@@ -624,31 +575,17 @@ watch(
   border-radius: 20rpx !important;
 }
 
-// 退出登录按钮样式
-:deep(.logout-button) {
-  width: 100% !important;
-  height: 80rpx !important;
-  font-size: 32rpx !important;
-  font-weight: bold !important;
-  border-radius: 40rpx !important;
-}
-
-// 文字白色样式（用于在蓝色背景上显示白色文字）
-.text-white {
-  color: #ffffff !important;
-}
-
 // 暗色模式适配
 :deep(.dark) {
   .tool-icon,
   .service-icon,
   .service-item:active {
-    background-color: var(--bg-color-2, #374151);
+    background-color: var(--bg-color-2);
   }
 
   .stats-divider,
   .card-header {
-    border-color: var(--border-color, #374151);
+    border-color: var(--border-color);
   }
 }
 </style>

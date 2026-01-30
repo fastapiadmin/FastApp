@@ -4,13 +4,16 @@
  */
 
 // 访问token
-export const APP_ACCESS_TOKEN_KEY = "appAccessToken";
+export const APP_ACCESS_TOKEN_KEY = 'appAccessToken'
 
 // 刷新token
-export const APP_REFRESH_TOKEN_KEY = "appRefreshToken";
+export const APP_REFRESH_TOKEN_KEY = 'appRefreshToken'
 
 // 用户缓存相关
-export const APP_USER_INFO = "appUserInfo";
+export const APP_USER_INFO = 'appUserInfo'
 
-// 全局配置相关
-export const APP_THEME_KEY = "appTheme";
+// 手动主题配置
+export const APP_MANUAL_THEME_KEY = 'manualTheme'
+
+// 全局主题配置
+export const APP_THEME_KEY = 'theme'

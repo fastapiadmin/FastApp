@@ -1,59 +1,59 @@
 // Type definitions for vite-plugin-uni-pages
 // This file provides type definitions for the uni-pages plugin
 
-declare module "@uni-helper/vite-plugin-uni-pages" {
-  import { Plugin } from "vite";
+declare module '@uni-helper/vite-plugin-uni-pages' {
+  import type { Plugin } from 'vite'
 
   export interface UniPagesOptions {
     /**
      * Subpackage directory
      * @default 'src/pages'
      */
-    subPackages?: string[];
+    subPackages?: string[]
 
     /**
      * Global style file
      */
-    globalStyle?: Record<string, any>;
+    globalStyle?: Record<string, any>
 
     /**
      * Tabbar configuration
      */
-    tabBar?: Record<string, any>;
+    tabBar?: Record<string, any>
 
     /**
      * Whether to merge pages.json
      * @default true
      */
-    mergePages?: boolean;
+    mergePages?: boolean
 
     /**
      * Whether to use uni-cloud-router
      * @default false
      */
-    uniCloudRouter?: boolean;
+    uniCloudRouter?: boolean
   }
 
-  export default function UniPages(options?: UniPagesOptions): Plugin;
+  export default function UniPages(options?: UniPagesOptions): Plugin
 }
 
 // Augment Uni namespace for type-safe routing
 declare global {
   namespace UniNamespace {
     interface NavigateToOptions {
-      url: string;
+      url: string
     }
 
     interface RedirectToOptions {
-      url: string;
+      url: string
     }
 
     interface SwitchTabOptions {
-      url: string;
+      url: string
     }
 
     interface ReLaunchOptions {
-      url: string;
+      url: string
     }
   }
 }

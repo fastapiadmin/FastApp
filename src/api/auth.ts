@@ -1,7 +1,7 @@
-import request from "@/utils/request";
-import { ApiHeader } from "@/enums/api-header.enum";
+import { ApiHeader } from '@/enums/api-header.enum'
+import { http } from '@/http'
 
-const AUTH_BASE_URL = "/system/auth";
+const AUTH_BASE_URL = '/system/auth'
 
 const AuthAPI = {
   /**
@@ -10,12 +10,11 @@ const AuthAPI = {
    * @returns 登录结果
    */
   login(body: LoginFormData): Promise<LoginResult> {
-    return request<LoginResult>({
-      url: `${AUTH_BASE_URL}/login`,
-      method: "POST",
-      header: { [ApiHeader.KEY]: ApiHeader.FORM },
-      data: body,
-    });
+    return http.Post(`${AUTH_BASE_URL}/login`, body, {
+      headers: {
+        [ApiHeader.KEY]: ApiHeader.FORM,
+      },
+    })
   },
 
   /**
@@ -24,11 +23,7 @@ const AuthAPI = {
    * @returns 新的访问令牌
    */
   refreshToken(body: RefreshToekenBody): Promise<any> {
-    return request<LoginResult>({
-      url: `${AUTH_BASE_URL}/token/refresh`,
-      method: "POST",
-      data: body,
-    });
+    return http.Post(`${AUTH_BASE_URL}/token/refresh`, body)
   },
 
   /**
@@ -36,10 +31,9 @@ const AuthAPI = {
    * @returns 验证码信息
    */
   getCaptcha(): Promise<any> {
-    return request<CaptchaInfo>({
-      url: `${AUTH_BASE_URL}/captcha/get`,
-      method: "GET",
-    });
+    // 添加随机参数防止缓存
+    const timestamp = new Date().getTime()
+    return http.Get(`${AUTH_BASE_URL}/captcha/get?timestamp=${timestamp}`)
   },
 
   /**
@@ -48,47 +42,43 @@ const AuthAPI = {
    * @returns 登出结果
    */
   logout(body: LogoutBody): Promise<any> {
-    return request<ApiResponse>({
-      url: `${AUTH_BASE_URL}/logout`,
-      method: "POST",
-      data: body,
-    });
+    return http.Post(`${AUTH_BASE_URL}/logout`, body)
   },
-};
+}
 
-export default AuthAPI;
+export default AuthAPI
 
 /** 登录表单数据 */
 export interface LoginFormData {
-  username: string;
-  password: string;
-  captcha_key: string;
-  captcha: string;
-  remember: boolean;
-  login_type: string;
+  username: string
+  password: string
+  captcha_key: string
+  captcha: string
+  remember: boolean
+  login_type: string
 }
 
 // 刷新令牌
 export interface RefreshToekenBody {
-  refresh_token: string;
+  refresh_token: string
 }
 
 /** 登录响应 */
 export interface LoginResult {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-  expires_in: number;
+  access_token: string
+  refresh_token: string
+  token_type: string
+  expires_in: number
 }
 
 /** 验证码信息 */
 export interface CaptchaInfo {
-  enable: boolean;
-  key: string;
-  img_base: string;
+  enable: boolean
+  key: string
+  img_base: string
 }
 
 /** 退出登录操作 */
 export interface LogoutBody {
-  token: string;
+  token: string
 }
