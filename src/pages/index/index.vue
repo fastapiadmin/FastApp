@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { onReady, onShow } from '@dcloudio/uni-app'
 import { reactive, ref } from 'vue'
+import LineChart from '@/subPages/echarts/components/LineChart.vue'
+
+defineOptions({
+  componentPlaceholder: {
+    LineChart: 'view',
+  },
+})
 
 definePage({
   name: 'home',
@@ -81,9 +88,6 @@ const NOTICE_TEXT = '通知公告: fastapp 是一个基于 Vue3 + UniApp 的前�
 
 // 默认日期范围（天数)
 const DEFAULT_DAYS_RANGE = 7
-
-// 日期范围选项
-const DAYS_RANGE_OPTIONS = [7, 15] as const
 
 // 访问统计数据
 const visitStatsData = ref<VisitStatsVO>(DEFAULT_VISIT_STATS)
@@ -179,12 +183,6 @@ function loadVisitTrendData() {
   }, 100)
 }
 
-// 数据范围变化
-function handleDataRangeChange(value: number) {
-  recentDaysRange.value = value
-  loadVisitTrendData()
-}
-
 onReady(() => {
   loadVisitStatsData()
   loadVisitTrendData()
@@ -228,8 +226,8 @@ onShow(() => {
             <image class="icon-image" :src="item.icon" lazy-load />
           </template>
           <template #text>
-            <view class="nav-title theme-text-primary">
-              {{ item.title }}
+            <view class="nav-title">
+              <wd-text :text="item.title" />
             </view>
           </template>
         </wd-grid-item>
@@ -250,57 +248,26 @@ onShow(() => {
       <view class="stats-item">
         <image class="stats-icon" src="/static/icons/visitor.png" lazy-load />
         <view class="stats-info">
-          <view class="stats-label">
-            访客数
-          </view>
-          <view class="stats-value theme-text-primary">
-            {{
-              visitStatsData.todayUvCount
-            }}
+          <wd-text text="访客数" />
+          <view class="stats-value">
+            <wd-text type="warning" :text="visitStatsData.todayUvCount" bold />
           </view>
         </view>
       </view>
       <view class="stats-item">
         <image class="stats-icon" src="/static/icons/browser.png" lazy-load />
         <view class="stats-info">
-          <view class="stats-label">
-            浏览量
-          </view>
-          <view class="stats-value theme-text-primary">
-            {{
-              visitStatsData.todayPvCount
-            }}
+          <wd-text text="浏览量" />
+          <view class="stats-value">
+            <wd-text type="success" :text="visitStatsData.todayPvCount" bold />
           </view>
         </view>
       </view>
     </view>
 
     <!-- 访问趋势 -->
-    <view class="trend-card">
-      <view class="trend-header">
-        <view class="trend-title">
-          访问趋势
-        </view>
-        <view class="trend-buttons">
-          <button
-            v-for="days in DAYS_RANGE_OPTIONS"
-            :key="days"
-            class="range-button"
-            :class="{ active: recentDaysRange === days }"
-            @click="handleDataRangeChange(days)"
-          >
-            近{{ days }}天
-          </button>
-        </view>
-      </view>
-      <view class="trend-content">
-        <view class="chart-container">
-          <!-- 简化处理，移除图表组件 -->
-          <view class="chart-placeholder">
-            访问趋势图表
-          </view>
-        </view>
-      </view>
+    <view class="mb-1 rounded-2 bg-gray-50 p-3 shadow-sm">
+      <LineChart />
     </view>
   </view>
 </template>
@@ -308,133 +275,57 @@ onShow(() => {
 <style lang="scss" scoped>
 .app-container {
   padding: 20rpx;
-}
 
-.swiper-container {
-  margin-bottom: 20rpx;
-  border-radius: 16rpx;
-  overflow: hidden;
-}
-
-.nav-grid {
-  margin-bottom: 20rpx;
-  border-radius: 16rpx;
-
-  .icon-image {
-    width: 64rpx;
-    height: 64rpx;
-    border-radius: 8rpx;
-  }
-
-  .nav-title {
+  .swiper-container {
     margin-bottom: 20rpx;
     border-radius: 16rpx;
-    font-size: 24rpx;
-    text-align: center;
-    margin-top: 12rpx;
+    overflow: hidden;
   }
-}
 
-.notice-text {
-  margin-bottom: 20rpx;
-  border-radius: 16rpx;
-}
+  .nav-grid {
+    margin-bottom: 20rpx;
+    border-radius: 16rpx;
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10rpx;
-  margin-bottom: 20rpx;
-}
+    .icon-image {
+      width: 64rpx;
+      height: 64rpx;
+      border-radius: 8rpx;
+    }
 
-.stats-item {
-  display: flex;
-  align-items: center;
-  padding: 20rpx;
-  background-color: var(--bg-color-2);
-  border-radius: 16rpx;
-}
+    .nav-title {
+      margin-bottom: 20rpx;
+      border-radius: 16rpx;
+      font-size: 24rpx;
+      text-align: center;
+      margin-top: 12rpx;
+    }
+  }
 
-.stats-icon {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 8rpx;
-  margin-right: 20rpx;
-}
+  .notice-text {
+    margin-bottom: 20rpx;
+    border-radius: 16rpx;
+  }
 
-.stats-info {
-  flex: 1;
-}
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10rpx;
+    margin-bottom: 20rpx;
+  }
 
-.stats-label {
-  font-size: 24rpx;
-  color: var(--text-color-2);
-  margin-bottom: 10rpx;
-}
+  .stats-item {
+    display: flex;
+    align-items: center;
+    padding: 20rpx;
+    background-color: var(--bg-color-2);
+    border-radius: 16rpx;
+  }
 
-.stats-value {
-  font-size: 32rpx;
-  font-weight: bold;
-}
-
-.trend-card {
-  background-color: var(--bg-color-2);
-  border-radius: 16rpx;
-  padding: 20rpx;
-  margin-bottom: 20rpx;
-}
-
-.trend-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20rpx;
-}
-
-.trend-title {
-  font-size: 28rpx;
-  font-weight: bold;
-  color: var(--text-color);
-}
-
-.trend-buttons {
-  display: flex;
-  gap: 10rpx;
-}
-
-.range-button {
-  padding: 8rpx 16rpx;
-  font-size: 20rpx;
-  border: 1rpx solid var(--border-color);
-  border-radius: 20rpx;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-}
-
-.range-button.active {
-  background-color: var(--primary-color);
-  color: white;
-  border-color: var(--primary-color);
-}
-
-.trend-content {
-  height: 240px;
-}
-
-.chart-container {
-  width: 100%;
-  height: 100%;
-}
-
-.chart-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--bg-color);
-  border-radius: 8rpx;
-  color: var(--text-color-2);
-  font-size: 24rpx;
+  .stats-icon {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 8rpx;
+    margin-right: 20rpx;
+  }
 }
 </style>

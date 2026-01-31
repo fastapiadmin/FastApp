@@ -9,6 +9,7 @@ type _LocationUrl =
   "/pages/mine/index" |
   "/pages/work/index" |
   "/subPages/about/index" |
+  "/subPages/account/index" |
   "/subPages/asyncEcharts/index" |
   "/subPages/ci/index" |
   "/subPages/create-uni/index" |
@@ -29,8 +30,7 @@ type _LocationUrl =
   "/subPages/settings/index" |
   "/subPages/skills/index" |
   "/subPages/styles/index" |
-  "/subPages/uni-ku-root/index" |
-  "/subPages/settings/account/index";
+  "/subPages/uni-ku-root/index";
 
 interface NavigateToOptions {
   url: _LocationUrl;

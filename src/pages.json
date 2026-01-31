@@ -200,6 +200,16 @@
         // #endif
         // #ifdef H5
         {
+          "path": "account/index",
+          "type": "page",
+          "name": "account",
+          "style": {
+            "navigationBarTitleText": "账号设置"
+          }
+        },
+        // #endif
+        // #ifdef H5
+        {
           "path": "asyncEcharts/index",
           "type": "page",
           "name": "echartsAsync",
@@ -248,16 +258,6 @@
             "navigationBarTitleText": "Agent Skills",
             "navigationBarBackgroundColor": "#f9fafb",
             "navigationBarTextStyle": "black"
-          }
-        },
-        // #endif
-        // #ifdef H5
-        {
-          "path": "settings/account/index",
-          "type": "page",
-          "name": "account",
-          "style": {
-            "navigationBarTitleText": "账号设置"
           }
         }
         // #endif

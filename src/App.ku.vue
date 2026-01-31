@@ -14,5 +14,8 @@ const { themeVars, theme } = useManualTheme()
     <!-- #ifdef MP-WEIXIN -->
     <privacy-popup />
     <!-- #endif -->
+
+    <!-- 文字水印 -->
+    <wd-watermark content="fastapp" :width="130" :height="130" />
   </wd-config-provider>
 </template>

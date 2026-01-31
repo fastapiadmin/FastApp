@@ -3,7 +3,6 @@ import { useUserStore } from '@/store/userStore'
 import { toLoginPage } from '@/utils/toLoginPage'
 import { ResultEnum } from '../tools/enum'
 
-const userStore = useUserStore()
 // 配置 baseURL
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 const API_PREFIX = import.meta.env.VITE_APP_BASE_API || ''
@@ -26,6 +25,7 @@ export function http<T>(options: CustomRequestOptions) {
       // #endif
       // 响应成功
       success: async (res) => {
+        const userStore = useUserStore()
         const responseData = res.data as IResponse<T>
         const { code } = responseData
 

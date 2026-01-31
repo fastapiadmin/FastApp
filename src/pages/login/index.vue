@@ -232,7 +232,7 @@ async function handleRegister() {
             </view>
           </view>
 
-
+          <wd-divider />
           <!-- 忘记密码和注册账号 -->
           <view class="auth-links">
             <!-- 记住我 -->
@@ -250,7 +250,6 @@ async function handleRegister() {
                 @click="handleForgotPassword"
               />
             </view>
-
           </view>
 
           <!-- 登录按钮 -->
@@ -269,22 +268,22 @@ async function handleRegister() {
           </view>
 
           <view class="register-link">
-              <wd-text size="24rpx" text="您没有账号?"/>
-              <wd-text
-                type="primary"
-                text="注册账号"
-                size="24rpx"
-                @click="handleRegister"
-              />
-            </view>
+            <wd-text size="24rpx" text="您没有账号?" />
+            <wd-text
+              type="primary"
+              text="注册账号"
+              size="24rpx"
+              @click="handleRegister"
+            />
+          </view>
 
-            <!-- 版权信息 -->
-            <view class="copyright">
-              <wd-text
-                text="Copyright © 2025-2026 service.fastapiadmin.com 版权所有 陕ICP备2025069493号-1"
-                size="20rpx"
-              />
-            </view>
+          <!-- 版权信息 -->
+          <view class="copyright">
+            <wd-text
+              text="Copyright © 2025-2026 service.fastapiadmin.com 版权所有 陕ICP备2025069493号-1"
+              size="20rpx"
+            />
+          </view>
         </wd-cell-group>
       </wd-form>
     </view>

@@ -1,5 +1,6 @@
 /// <reference types="@uni-helper/vite-plugin-uni-pages/client" />
 import { pages, subPackages } from 'virtual:uni-pages'
+import { useUserStore } from '@/store/userStore'
 
 function generateRoutes() {
   const routes = pages.map((page) => {
@@ -27,6 +28,44 @@ router.beforeEach((to, from, next) => {
   // 演示：基本的导航日志记录
   if (to.path && from.path) {
     console.log(`📍 导航: ${from.path} → ${to.path}`)
+  }
+
+  // 跳过登录页面的检查
+  if (to.path === '/pages/login/index') {
+    return next()
+  }
+
+  // 检查登录状态
+  try {
+    const userStore = useUserStore()
+    const accessToken = userStore.getAccessToken()
+
+    if (!accessToken) {
+      uni.showToast({
+        title: '🔐 Token不存在，跳转到登录页面',
+        icon: 'error',
+      })
+      // 跳转到登录页面
+      uni.navigateTo({
+        url: `/pages/login/index?redirect=${encodeURIComponent(to.path)}`,
+        fail: (error) => {
+          console.error('跳转登录页面失败:', error)
+          // 如果 navigateTo 失败，尝试使用 reLaunch
+          uni.reLaunch({
+            url: '/pages/login/index',
+          })
+        },
+      })
+      return
+    }
+  }
+  catch (error) {
+    console.error('检查登录状态时发生错误:', error)
+    // 发生错误时，跳转到登录页面
+    uni.reLaunch({
+      url: '/pages/login/index',
+    })
+    return
   }
 
   // 演示：对受保护页面的简单拦截

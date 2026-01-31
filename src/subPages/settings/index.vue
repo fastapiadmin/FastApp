@@ -1,8 +1,4 @@
 <script lang="ts" setup>
-import { onLoad, onShow } from '@dcloudio/uni-app'
-import { computed, ref } from 'vue'
-import { useUserStore } from '@/store/userStore'
-
 definePage({
   name: 'settings',
   style: {
@@ -10,54 +6,37 @@ definePage({
   },
 })
 
-const userStore = useUserStore()
-const isLogin = computed(() => !!userStore.userInfo)
-const { initNavigationBar, setNavigationBarStyle } = useNavigationBar()
-
-// 初始化导航栏样式
-initNavigationBar()
-
-// 页面显示时重新设置导航栏样式
-onShow(() => {
-  setNavigationBarStyle()
-})
-
-// 个人资料
-function navigateToProfile() {
-  if (isLogin.value) {
-    uni.navigateTo({
-      url: '/pages/mine/profile/index',
-    })
-  }
-}
-
-// 账号和安全
-function navigateToAccount() {
-  if (isLogin.value) {
-    uni.navigateTo({
-      url: '/pages/mine/settings/account/index',
-    })
-  }
-}
-
-// 主题设置
-function navigateToTheme() {
-  uni.navigateTo({
-    url: '/pages/mine/settings/theme/index',
-  })
-}
-
-// 关于我们
-function navigateToAbout() {
-  uni.navigateTo({
-    url: '/pages/mine/about/index',
-  })
-}
-
 // 是否正在清理
 const clearing = ref(false)
 // 缓存大小
 const cacheSize = ref<any>('计算中...')
+
+const {
+  theme,
+  toggleTheme,
+  currentThemeColor,
+  showThemeColorSheet,
+  themeColorOptions,
+  openThemeColorPicker,
+  closeThemeColorPicker,
+  selectThemeColor,
+  setFollowSystem,
+} = useManualTheme()
+
+const isDark = computed({
+  get() {
+    return theme.value === 'dark'
+  },
+  set() {
+    toggleTheme()
+  },
+})
+
+// 处理主题色选择
+function handleThemeColorSelect(option: any) {
+  selectThemeColor(option)
+}
+
 // 获取缓存大小
 async function getCacheSize() {
   try {
@@ -143,23 +122,6 @@ async function handleClearCache() {
   }
 }
 
-// 退出登录
-function handleLogout() {
-  uni.showModal({
-    title: '提示',
-    content: '确定要退出登录吗？',
-    success(res) {
-      if (res.confirm) {
-        userStore.logout()
-        uni.showToast({
-          title: '已退出登录',
-          icon: 'success',
-        })
-      }
-    },
-  })
-}
-
 // 页面加载时初始化
 onLoad(() => {
   getCacheSize()
@@ -168,48 +130,70 @@ onLoad(() => {
 
 <template>
   <view class="app-container">
-    <wd-cell-group>
-      <wd-cell
-        v-if="isLogin"
-        title="个人资料"
-        icon="user"
-        is-link
-        @click="navigateToProfile"
-      />
-      <wd-cell
-        v-if="isLogin"
-        title="账号和安全"
-        icon="secured"
-        is-link
-        @click="navigateToAccount"
-      />
-      <wd-cell
-        title="主题设置"
-        icon="setting1"
-        is-link
-        @click="navigateToTheme"
-      />
-      <wd-cell
-        title="关于我们"
-        icon="info-circle"
-        is-link
-        @click="navigateToAbout"
-      />
-      <wd-divider />
-      <wd-cell
-        title="清空缓存"
-        icon="delete1"
-        :value="cacheSize"
-        clickable
-        @click="handleClearCache"
-      />
-    </wd-cell-group>
+    <demo-block title="基础设置" transparent>
+      <wd-cell-group border custom-class="rounded-2! overflow-hidden">
+        <wd-cell title="暗黑模式">
+          <wd-switch v-model="isDark" size="18px" />
+        </wd-cell>
+        <wd-cell title="跟随系统">
+          <wd-button size="small" @click="setFollowSystem">
+            跟随系统
+          </wd-button>
+        </wd-cell>
+        <wd-cell title="选择主题色" is-link @click="openThemeColorPicker">
+          <view class="flex items-center justify-end gap-2">
+            <view
+              class="h-4 w-4 rounded-full"
+              :style="{ backgroundColor: currentThemeColor.primary }"
+            />
+            <text>{{ currentThemeColor.name }}</text>
+          </view>
+        </wd-cell>
 
-    <view v-if="isLogin" class="logout-section">
-      <wd-button class="logout-btn" @click="handleLogout">
-        退出登录
-      </wd-button>
-    </view>
+        <wd-divider />
+        <wd-cell
+          title="清空缓存"
+          icon="delete1"
+          :value="cacheSize"
+          clickable
+          @click="handleClearCache"
+        />
+      </wd-cell-group>
+    </demo-block>
+
+    <!-- 主题色选择 ActionSheet -->
+    <wd-action-sheet
+      v-model="showThemeColorSheet"
+      title="选择主题色"
+      :close-on-click-action="true"
+      @cancel="closeThemeColorPicker"
+    >
+      <view class="px-4 pb-4">
+        <view
+          v-for="option in themeColorOptions"
+          :key="option.value"
+          class="flex items-center justify-between border-b border-gray-100 py-3 last:border-b-0 dark:border-gray-700"
+          @click="handleThemeColorSelect(option)"
+        >
+          <view class="flex items-center gap-3">
+            <view
+              class="h-6 w-6 border-2 border-gray-200 rounded-full dark:border-gray-600"
+              :style="{ backgroundColor: option.primary }"
+            />
+            <text class="text-4 text-gray-800 dark:text-gray-200">
+              {{ option.name }}
+            </text>
+          </view>
+          <wd-icon
+            v-if="currentThemeColor.value === option.value"
+            name="check"
+            :color="option.primary"
+            size="20px"
+          />
+        </view>
+      </view>
+      <wd-gap :height="50" />
+    </wd-action-sheet>
 
     <!-- 使用wot-design-uni的Loading组件 -->
     <wd-loading
@@ -223,98 +207,4 @@ onLoad(() => {
 </template>
 
 <style lang="scss">
-// H5 环境下导航栏样式 - 使用系统主题变量
-// #ifdef H5
-.uni-page-head {
-  background-color: var(--card-bg-color) !important;
-  border-bottom-color: var(--border-color) !important;
-  transition:
-    background-color 0.3s ease,
-    border-color 0.3s ease;
-}
-
-.wot-theme-dark .uni-page-head {
-  background-color: var(--bg-color) !important;
-  border-bottom-color: var(--border-color) !important;
-}
-
-.uni-page-head__title {
-  color: var(--text-color) !important;
-  transition: color 0.3s ease;
-}
-
-.wot-theme-dark .uni-page-head__title {
-  color: var(--text-color) !important;
-}
-
-.uni-page-head__btn {
-  color: var(--text-color) !important;
-  transition: color 0.3s ease;
-}
-
-.wot-theme-dark .uni-page-head__btn {
-  color: var(--text-color) !important;
-}
-
-// #endif
-
-.app-container {
-  min-height: 100vh;
-  background-color: var(--card-bg-color);
-  transition: background-color 0.3s ease;
-}
-
-// 暗黑模式支持
-.wot-theme-dark .app-container {
-  background-color: var(--bg-color);
-}
-
-.logout-section {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 20rpx;
-  margin-top: 40rpx;
-}
-
-.logout-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 90%;
-  height: 90rpx;
-  font-size: 32rpx;
-  font-weight: 500;
-  color: var(--text-color-inverse);
-  background-color: var(--primary-color);
-  border: none;
-  border-radius: 45rpx;
-  box-shadow: var(--shadow-medium);
-  transition:
-    opacity 0.2s,
-    background-color 0.3s ease;
-
-  &:active {
-    opacity: 0.85;
-  }
-}
-
-:deep(.loading-center) {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--mask-color);
-  border-radius: 12rpx;
-}
-
-:deep(.loading-center .wd-loading__spinner) {
-  margin: 0 auto;
-}
-
-:deep(.loading-center .wd-loading__text) {
-  margin-top: 20rpx;
-  color: var(--text-color-inverse);
-  text-align: center;
-}
 </style>

@@ -9,8 +9,6 @@ import { useUserStore } from '@/store/userStore'
 import { toLoginPage } from '@/utils/toLoginPage'
 import { ContentTypeEnum, ResultEnum, ShowMessage } from '../tools/enum'
 
-const userStore = useUserStore()
-
 // 配置动态Tag
 export const API_DOMAINS = {
   DEFAULT: import.meta.env.VITE_API_BASE_URL || '',
@@ -66,6 +64,7 @@ const alovaInstance = createAlova({
       = !isCaptchaRequest && !isLoginRequest && !config.meta?.ignoreAuth
     // 处理认证信息   自行处理认证问题
     if (shouldAuth) {
+      const userStore = useUserStore()
       const token = userStore.getAccessToken()
       // 只在需要认证时检查 token，验证码请求跳过
       if (!token && !isCaptchaRequest) {
@@ -86,7 +85,7 @@ const alovaInstance = createAlova({
   responded: onResponseRefreshToken((response, method) => {
     const { config } = method
     const { requestType } = config
-    const { statusCode, data: rawData, errMsg } = response as any
+    const { statusCode, data: rawData } = response as any
 
     // 处理特殊请求类型（上传/下载）
     if (requestType === 'upload' || requestType === 'download') {
@@ -97,11 +96,7 @@ const alovaInstance = createAlova({
     if (statusCode !== 200) {
       const errorMessage
         = rawData?.msg || rawData?.message || (rawData as any)?.error || ShowMessage(statusCode) || `HTTP请求错误[${statusCode}]`
-      uni.showToast({
-        title: errorMessage,
-        icon: 'none',
-      })
-      throw new Error(`${errorMessage}：${errMsg}`)
+      throw new Error(errorMessage)
     }
 
     // 处理业务逻辑错误
@@ -109,13 +104,7 @@ const alovaInstance = createAlova({
     // 0和200当做成功都很普遍，这里直接兼容两者，见 ResultEnum
     if (code !== ResultEnum.Success0 && code !== ResultEnum.Success200) {
       const errorMessage = msg || message || '请求错误'
-      if (config.meta?.toast !== false) {
-        uni.showToast({
-          title: errorMessage,
-          icon: 'none',
-        })
-      }
-      throw new Error(`请求错误[${code}]：${errorMessage}`)
+      throw new Error(errorMessage)
     }
     // 处理成功响应，返回业务数据
     return data
