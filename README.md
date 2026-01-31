@@ -164,7 +164,7 @@ pnpm run type-check
 
 | 群组二维码 | 微信支付二维码 |
 | --- | --- |
-| ![群组二维码](https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/group.jpg) | ![微信支付二维码](https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/wechatPay.jpg) |
+| ![群组二维码](https://gitee.com/fastapiadmin/FastDocs/raw/master/docs/public/group.jpg) | ![微信支付二维码](https://gitee.com/fastapiadmin/FastDocs/raw/master/docs/public/wechatPay.jpg) |
 
 ---
 
