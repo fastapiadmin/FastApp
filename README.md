@@ -1,6 +1,6 @@
 <div align="center">
   <p align="center">
-    <img src="https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/logo.png" width="200" />
+    <img src="https://gitee.com/fastapiadmin/FastDocs/raw/master/docs/public/logo.png" width="200" />
   </p>
   <h1 align="center">
     FastApp
@@ -103,7 +103,7 @@ FastApp/
 
 | 登录 <div style="width:60px"/> | 首页 <div style="width:60px"/> | 个人中心 <div style="width:60px"/> |
 |----------|----------|----------|
-| ![移动端登录](https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/app_login.png) | ![移动端首页](https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/app_home.png) | ![移动端个人中心](https://gitee.com/fastapiadmin/FastDocs/raw/main/docs/public/app_mine.png) |
+| ![移动端登录](https://gitee.com/fastapiadmin/FastDocs/raw/master/docs/public/app_login.png) | ![移动端首页](https://gitee.com/fastapiadmin/FastDocs/raw/master/docs/public/app_home.png) | ![移动端个人中心](https://gitee.com/fastapiadmin/FastDocs/raw/master/docs/public/app_mine.png) |
 
 ## 🚀 快速开始
 
